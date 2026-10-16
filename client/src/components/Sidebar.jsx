@@ -1,0 +1,243 @@
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Bot,
+  CreditCard,
+  ShieldCheck,
+  FileText,
+  Clock,
+  RotateCcw,
+  AlertCircle,
+  Loader2,
+  X,
+  PanelLeftClose
+} from 'lucide-react';
+import { dealService, demoService, policyService } from '../services/api';
+import toast from 'react-hot-toast';
+
+export default function Sidebar({ isOpen, onClose }) {
+  const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
+  const [policy, setPolicy] = useState(null);
+  const [resetting, setResetting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const fetchStatus = async () => {
+    try {
+      const [dealsRes, policyRes] = await Promise.all([
+        dealService.getDeals(),
+        policyService.getPolicy()
+      ]);
+      const deals = dealsRes.data?.deals || [];
+      setPendingCount(deals.filter(d => d.status === 'pending_approval').length);
+      setPolicy(policyRes.data?.policy);
+    } catch (err) {
+      // quiet fail on background poll
+    }
+  };
+
+  useEffect(() => {
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 20000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleReset = async () => {
+    setShowConfirm(false);
+    setResetting(true);
+    try {
+      await demoService.reset();
+      toast.success('Demo environment reset successfully');
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    } catch (err) {
+      toast.error(err.message || 'Failed to reset demo data');
+      setResetting(false);
+    }
+  };
+
+  const navItems = [
+    { label: 'Overview', to: '/', icon: LayoutDashboard },
+    { label: 'Purchase Requests', to: '/requests', icon: ShoppingBag },
+    { label: 'Agent Marketplace', to: '/agents', icon: Bot },
+    { label: 'Transactions', to: '/transactions', icon: CreditCard },
+    { label: 'Policy Center', to: '/policy', icon: ShieldCheck },
+    { label: 'Audit Logs', to: '/audit', icon: FileText },
+    { label: 'Approvals', to: '/approvals', icon: Clock, badge: pendingCount }
+  ];
+
+  const total = Number(policy?.totalBudget) || 5000;
+  const spent = Number(policy?.spentAmount) || 0;
+  const committed = Number(policy?.committedAmount) || 0;
+  const remaining = Math.max(0, total - spent - committed);
+  const spentPercent = Math.min(100, (spent / total) * 100);
+
+  return (
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-40 md:hidden"
+        />
+      )}
+
+      {/* Sidebar Panel */}
+      <aside
+        className={`fixed top-0 bottom-0 left-0 w-60 bg-[#FFFFFF] border-r border-[#E6E8EC] z-50 flex flex-col justify-between transition-transform duration-200 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div>
+          {/* Logo & Header */}
+          <div className="h-16 px-5 border-b border-[#E6E8EC] flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
+                <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
+              </div>
+              <div>
+                <span className="font-semibold text-[15px] tracking-tight text-[#171A21] block leading-none">
+                  SpendMesh <span className="text-[#2563EB]">AI</span>
+                </span>
+                <span className="text-[10px] text-[#667085] font-normal block mt-1 tracking-tight">
+                  Financial Policy Layer
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="p-1.5 text-[#475467] hover:text-[#101828] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#D0D5DD] hover:border-[#98A2B3] rounded-lg transition-all shadow-2xs hover:shadow-xs active:scale-95 flex items-center justify-center group"
+              title="Close sidebar"
+              aria-label="Close sidebar"
+            >
+              <PanelLeftClose className="w-4 h-4 stroke-[2.2] text-[#475467] group-hover:text-[#101828] transition-colors" />
+            </button>
+          </div>
+
+          {/* Understated Environment Badge */}
+          <div className="px-4 py-2.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0FDF4] border border-[#BBF7D0] text-[12px] font-semibold text-[#15803D] w-full shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#15803D]" />
+              <span className="truncate">PayPal Sandbox v2</span>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="px-3 space-y-1 mt-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  onClick={() => {
+                    // Only auto-close on mobile screens (< 768px), keep open on desktop
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                      onClose && onClose();
+                    }
+                  }}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[#EFF4FF] text-[#2563EB] font-bold shadow-xs'
+                        : 'text-[#475569] hover:text-[#171A21] hover:bg-[#F7F8FA]'
+                    }`
+                  }
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-4 h-4 shrink-0 stroke-[2]" />
+                    <span>{item.label}</span>
+                  </div>
+
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="px-2 py-0.5 text-[11px] font-bold leading-none bg-[#B45309] text-white rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Footer Area: Budget Summary & Demo Reset */}
+        <div className="p-4 border-t border-[#E6E8EC] space-y-3 bg-[#FAFAFC]">
+          {/* Compact Budget Micro-Widget */}
+          <div className="p-3.5 bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] space-y-2 shadow-2xs">
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="text-[#667085] font-semibold">Policy Budget</span>
+              <span className="font-bold text-[#171A21] tabular-nums">
+                ${spent.toFixed(0)} / ${total.toFixed(0)}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-[#F0F2F5] rounded-full overflow-hidden">
+              <div
+                style={{ width: `${spentPercent}%` }}
+                className="bg-[#2563EB] h-full transition-all duration-300 rounded-full"
+              />
+            </div>
+            <div className="flex justify-between text-[11px] font-medium text-[#667085]">
+              <span>Avail: ${remaining.toFixed(0)}</span>
+              <span>Limit: ${policy?.autoApproveLimit ?? 1000}</span>
+            </div>
+          </div>
+
+          {/* Reset Demo Button */}
+          <button
+            onClick={() => setShowConfirm(true)}
+            disabled={resetting}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-[13px] font-semibold text-[#667085] hover:text-[#171A21] bg-[#FFFFFF] hover:bg-[#F7F8FA] border border-[#E6E8EC] rounded-lg transition-colors disabled:opacity-50 shadow-2xs"
+          >
+            {resetting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#2563EB]" />
+                <span>Resetting...</span>
+              </>
+            ) : (
+              <>
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset Demo Environment</span>
+              </>
+            )}
+          </button>
+        </div>
+      </aside>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-sm w-full p-6 border border-[#E6E8EC] animate-in fade-in zoom-in-95">
+            <div className="w-10 h-10 rounded-lg bg-[#FEF2F2] text-[#B42318] flex items-center justify-center mb-4">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <h4 className="text-[15px] font-semibold text-[#171A21] mb-1">
+              Reset Demo Environment?
+            </h4>
+            <p className="text-[13px] text-[#667085] mb-5 leading-relaxed">
+              This will clear recent test deals, captured payments, and reset the policy budget back to $5,000 for a fresh judge demonstration.
+            </p>
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-3.5 py-1.5 text-[13px] font-medium text-[#667085] hover:text-[#171A21] bg-[#FFFFFF] hover:bg-[#F7F8FA] border border-[#E6E8EC] rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReset}
+                className="px-3.5 py-1.5 text-[13px] font-medium text-white bg-[#B42318] hover:bg-[#991B1B] rounded-lg shadow-xs transition-colors"
+              >
+                Reset Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

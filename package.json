@@ -1,0 +1,18 @@
+{
+  "name": "spendmesh-ai",
+  "version": "1.0.0",
+  "description": "The financial trust layer between AI agents and your payment account",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "test": "npm run test --prefix server",
+    "start": "npm run start --prefix server",
+    "install:all": "npm install --prefix server && npm install --prefix client"
+  },
+  "keywords": ["paypal", "gemini", "ai-agents", "spending-policy", "fintech"],
+  "author": "Vinayak Santosh Pawate",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

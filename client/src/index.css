@@ -1,0 +1,60 @@
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #F7F8FA;
+    color: #171A21;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Suppress AG Grid Community watermark */
+.ag-watermark {
+  display: none !important;
+}
+
+/* Refined AG Grid styling to blend seamlessly into SaaS layout */
+.ag-theme-alpine {
+  --ag-background-color: #FFFFFF;
+  --ag-header-background-color: #F7F8FA;
+  --ag-header-foreground-color: #667085;
+  --ag-border-color: #E6E8EC;
+  --ag-row-border-color: #E6E8EC;
+  --ag-font-size: 13px;
+  --ag-font-family: inherit;
+  --ag-selected-row-background-color: #EFF4FF;
+  --ag-odd-row-background-color: #FFFFFF;
+  --ag-header-height: 40px;
+  --ag-row-height: 48px;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #667085;
+}
+
+/* Clean Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D0D5DD;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #98A2B3;
+}

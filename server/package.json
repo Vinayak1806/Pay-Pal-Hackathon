@@ -1,0 +1,29 @@
+{
+  "name": "spendmesh-ai-server",
+  "version": "1.0.0",
+  "description": "SpendMesh AI Backend API",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "node --watch src/app.js",
+    "start": "node src/app.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit --detectOpenHandles"
+  },
+  "keywords": [],
+  "author": "Vinayak Santosh Pawate",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.12.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.0"
+  }
+}
