@@ -19,7 +19,7 @@ import toast from 'react-hot-toast';
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
-  const [pendingCount, setPendingCount] = useState(0);
+  const [approvalsCount, setApprovalsCount] = useState({ pending: 0, approvedUnpaid: 0 });
   const [policy, setPolicy] = useState(null);
   const [resetting, setResetting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -31,7 +31,9 @@ export default function Sidebar({ isOpen, onClose }) {
         policyService.getPolicy()
       ]);
       const deals = dealsRes.data?.deals || [];
-      setPendingCount(deals.filter(d => d.status === 'pending_approval').length);
+      const pending = deals.filter(d => d.status === 'pending_approval').length;
+      const approvedUnpaid = deals.filter(d => d.status === 'approved').length;
+      setApprovalsCount({ pending, approvedUnpaid });
       setPolicy(policyRes.data?.policy);
     } catch (err) {
       // quiet fail on background poll
@@ -59,6 +61,9 @@ export default function Sidebar({ isOpen, onClose }) {
     }
   };
 
+  const totalApprovals = approvalsCount.pending + approvalsCount.approvedUnpaid;
+  const approvalsBadgeVariant = approvalsCount.pending > 0 ? 'amber' : 'green';
+
   const navItems = [
     { label: 'Overview', to: '/', icon: LayoutDashboard },
     { label: 'Purchase Requests', to: '/requests', icon: ShoppingBag },
@@ -66,7 +71,13 @@ export default function Sidebar({ isOpen, onClose }) {
     { label: 'Transactions', to: '/transactions', icon: CreditCard },
     { label: 'Policy Center', to: '/policy', icon: ShieldCheck },
     { label: 'Audit Logs', to: '/audit', icon: FileText },
-    { label: 'Approvals', to: '/approvals', icon: Clock, badge: pendingCount }
+    {
+      label: 'Approvals',
+      to: '/approvals',
+      icon: Clock,
+      badge: totalApprovals,
+      badgeVariant: approvalsBadgeVariant
+    }
   ];
 
   const total = Number(policy?.totalBudget) || 5000;
@@ -155,7 +166,9 @@ export default function Sidebar({ isOpen, onClose }) {
                   </div>
 
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="px-2 py-0.5 text-[11px] font-bold leading-none bg-[#B45309] text-white rounded-full">
+                    <span className={`px-2 py-0.5 text-[11px] font-bold leading-none text-white rounded-full ${
+                      item.badgeVariant === 'green' ? 'bg-[#047857]' : 'bg-[#B45309]'
+                    }`}>
                       {item.badge}
                     </span>
                   )}

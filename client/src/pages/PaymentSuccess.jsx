@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReceiptModal from '../components/ReceiptModal';
+import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -37,8 +38,16 @@ export default function PaymentSuccess() {
         const res = await paymentService.capturePayment(token);
         if (res.data?.captureStatus === 'COMPLETED' || res.data?.dealStatus === 'payment_completed') {
           setCaptureData(res.data);
+          // Emit verified capture — drives voice narration based on real backend result
+          voiceEventBus.emit(VoiceEvents.CAPTURE_VERIFIED, {
+            amount: res.data.amount,
+            captureId: res.data.captureId,
+          }, { force: true });
         } else {
           setError(`Payment capture incomplete: status ${res.data?.captureStatus}`);
+          voiceEventBus.emit(VoiceEvents.CAPTURE_FAILED, {
+            reason: `Capture status: ${res.data?.captureStatus}`,
+          }, { force: true });
         }
       } catch (err) {
         try {

@@ -68,10 +68,10 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/30 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-lg w-full border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-lg w-full max-h-[88vh] flex flex-col border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E8EC]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E8EC] shrink-0 bg-white">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
               <Sliders className="w-4 h-4 stroke-[2]" />
@@ -94,7 +94,7 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-5 text-[13px] text-[#171A21]">
+        <div className="p-6 space-y-5 text-[13px] text-[#171A21] overflow-y-auto flex-1">
           {/* Rule 1: Auto-Approve Limit */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E6E8EC] flex items-center justify-between">
+        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E6E8EC] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={handleResetDefaults}

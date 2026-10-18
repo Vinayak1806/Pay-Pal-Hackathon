@@ -58,3 +58,24 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #98A2B3;
 }
+
+/* Print Styles: Isolate receipts/certificates, hide app chrome completely */
+@media print {
+  header,
+  aside,
+  footer,
+  nav,
+  .print-hidden,
+  [data-print-hide],
+  #voice-assistant-panel,
+  #voice-assistant-button {
+    display: none !important;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    color: #101828 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

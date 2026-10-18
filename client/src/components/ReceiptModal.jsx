@@ -32,10 +32,10 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/30 backdrop-blur-xs flex items-center justify-center p-4 print:p-0 print:bg-white">
-      <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-xl w-full border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 print:shadow-none print:border-none">
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 print:static print:inset-auto print:block print:p-0 print:bg-white print:overflow-visible">
+      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto print:shadow-none print:border print:border-[#E2E8F0] print:max-h-none print:block print:w-full print:max-w-none print:my-0">
         {/* Certificate Header Banner */}
-        <div className="p-6 border-b border-[#E6E8EC] bg-[#FFFFFF] flex items-center justify-between">
+        <div className="p-6 border-b border-[#E6E8EC] bg-[#FFFFFF] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#EFF4FF] border border-[#BFDBFE] text-[#2563EB] flex items-center justify-center">
               <ShieldCheck className="w-5 h-5 stroke-[2]" />
@@ -59,7 +59,7 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
         </div>
 
         {/* Certificate Body */}
-        <div className="p-6 space-y-4 text-[13px] text-[#171A21]">
+        <div className="p-6 space-y-4 text-[13px] text-[#171A21] overflow-y-auto flex-1 print:overflow-visible print:p-6">
           {/* Trust Verification Badge */}
           <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-[#15803D] font-medium text-[12px]">
@@ -133,7 +133,7 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E6E8EC] flex items-center justify-between print:hidden">
+        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E6E8EC] flex items-center justify-between shrink-0 print:hidden">
           <button
             onClick={onClose}
             className="px-3 py-1.5 text-[12px] font-medium text-[#667085] hover:text-[#171A21]"

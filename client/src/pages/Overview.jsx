@@ -52,8 +52,10 @@ export default function Overview() {
   const remaining = Math.max(0, total - spent - committed);
 
   const pendingDeals = deals.filter(d => d.status === 'pending_approval');
+  const unpaidAuthorizedDeals = deals.filter(d => d.status === 'approved');
   const blockedDeals = deals.filter(d => d.status === 'blocked');
   const completedDeals = deals.filter(d => d.status === 'payment_completed');
+  const totalActionableApprovals = pendingDeals.length + unpaidAuthorizedDeals.length;
 
   // Policy decision feed items from recent deals
   const recentDecisions = deals.slice(0, 4).map(d => {
@@ -65,6 +67,18 @@ export default function Overview() {
       outcome = 'Escalated';
       outcomeClass = 'text-[#B45309] bg-[#FFFBEB] border-[#FED7AA]';
       reason = d.blockedReason || 'Exceeds auto-approval limit';
+    } else if (d.status === 'approved') {
+      outcome = 'Authorized (Unpaid)';
+      outcomeClass = 'text-[#047857] bg-[#ECFDF5] border-[#A7F3D0]';
+      reason = 'Authorized by supervisor — ready for PayPal checkout';
+    } else if (d.status === 'checkout_created') {
+      outcome = 'Checkout Created';
+      outcomeClass = 'text-[#2563EB] bg-[#EFF4FF] border-[#BFDBFE]';
+      reason = 'PayPal checkout initiated';
+    } else if (d.status === 'payment_completed') {
+      outcome = 'Settled';
+      outcomeClass = 'text-[#15803D] bg-[#F0FDF4] border-[#BBF7D0]';
+      reason = 'Captured and settled via PayPal Sandbox';
     } else if (d.status === 'blocked') {
       outcome = 'Blocked';
       outcomeClass = 'text-[#B42318] bg-[#FEF2F2] border-[#FECACA]';
@@ -148,22 +162,45 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* KPI 2: Pending Approvals - Amber Warning */}
-        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-xs hover:border-[#FED7AA] transition-colors">
+        {/* KPI 2: Approvals & Settlement Queue */}
+        <div className={`bg-[#FFFFFF] p-5 rounded-xl border shadow-xs transition-colors ${
+          unpaidAuthorizedDeals.length > 0
+            ? 'border-[#BBF7D0] hover:border-[#86EFAC]'
+            : pendingDeals.length > 0
+            ? 'border-[#FED7AA] hover:border-[#FDBA74]'
+            : 'border-[#E6E8EC] hover:border-[#D0D5DD]'
+        }`}>
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[13px] font-semibold text-[#171A21]">
-              Pending Approvals
+              Approvals &amp; Unpaid
             </span>
             <Link to="/approvals" className="text-[12px] text-[#2563EB] hover:underline font-semibold">
               Queue &rarr;
             </Link>
           </div>
-          <span className="text-[28px] font-bold text-[#B45309] tabular-nums tracking-tight block">
-            {pendingDeals.length}
-          </span>
-          <p className="text-[12px] text-[#667085] mt-3 leading-relaxed">
-            {pendingDeals.length === 0
-              ? 'All transactions within automatic limits'
+          <div className="flex items-baseline gap-2">
+            <span className={`text-[28px] font-bold tabular-nums tracking-tight block ${
+              pendingDeals.length > 0
+                ? 'text-[#B45309]'
+                : unpaidAuthorizedDeals.length > 0
+                ? 'text-[#15803D]'
+                : 'text-[#64748B]'
+            }`}>
+              {totalActionableApprovals}
+            </span>
+            {unpaidAuthorizedDeals.length > 0 && (
+              <span className="text-[11px] font-bold text-[#047857] bg-[#ECFDF5] px-2 py-0.5 rounded-full border border-[#A7F3D0]">
+                {unpaidAuthorizedDeals.length} Ready to Pay
+              </span>
+            )}
+          </div>
+          <p className="text-[12px] text-[#667085] mt-2.5 leading-relaxed">
+            {totalActionableApprovals === 0
+              ? 'All transactions settled or within automatic limits'
+              : pendingDeals.length > 0 && unpaidAuthorizedDeals.length > 0
+              ? `${pendingDeals.length} awaiting review • ${unpaidAuthorizedDeals.length} authorized (unpaid)`
+              : unpaidAuthorizedDeals.length > 0
+              ? `${unpaidAuthorizedDeals.length} authorized deal(s) awaiting PayPal settlement`
               : `${pendingDeals.length} deal(s) require supervisor review`}
           </p>
         </div>

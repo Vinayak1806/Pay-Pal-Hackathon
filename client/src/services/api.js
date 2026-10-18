@@ -96,6 +96,10 @@ export const auditService = {
   getLogs: async (params = {}) => {
     const res = await api.get('/audit', { params });
     return res.data;
+  },
+  verifyIntegrity: async () => {
+    const res = await api.get('/audit/verify');
+    return res.data;
   }
 };
 

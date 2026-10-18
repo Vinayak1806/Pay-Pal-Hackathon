@@ -288,9 +288,9 @@ export default function Dashboard() {
 
       {/* Transaction Lifecycle Inspector Modal */}
       {selectedLifecycleDeal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/30 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-lg w-full border border-[#E2E8F0] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
+        <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6">
+          <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] flex flex-col border border-[#E2E8F0] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+            <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between shrink-0 bg-white">
               <div>
                 <h3 className="text-[17px] font-bold text-[#101828]">Transaction Traceability Lifecycle</h3>
                 <p className="text-[13px] text-[#64748B] font-mono mt-0.5">Deal #{selectedLifecycleDeal.dealId.substring(0, 8)}</p>
@@ -303,7 +303,7 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="p-6 space-y-4 text-[13px]">
+            <div className="p-6 space-y-4 text-[13px] overflow-y-auto flex-1">
               {/* Lifecycle progression timeline */}
               <div className="space-y-3.5 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-[#E2E8F0]">
                 {/* Step 1 */}
@@ -367,7 +367,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="px-6 py-3.5 bg-[#F8FAFC] border-t border-[#E2E8F0] flex justify-end">
+            <div className="px-6 py-3.5 bg-[#F8FAFC] border-t border-[#E2E8F0] flex justify-end shrink-0">
               <button
                 onClick={() => setSelectedLifecycleDeal(null)}
                 className="px-5 py-2 text-[13px] font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-lg transition-colors shadow-xs"

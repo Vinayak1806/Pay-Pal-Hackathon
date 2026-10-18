@@ -22,9 +22,12 @@ import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StatusBadge from '../components/StatusBadge';
 import toast from 'react-hot-toast';
+import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
+import { useVoiceContext } from '../context/VoiceContext';
 
 export default function Marketplace() {
   const navigate = useNavigate();
+  const { updateVoiceContext } = useVoiceContext();
 
   // Policy state
   const [policy, setPolicy] = useState(null);
@@ -80,6 +83,9 @@ export default function Marketplace() {
     setError(null);
     setTamperMessage(null);
 
+    // Emit: parsing started
+    voiceEventBus.emit(VoiceEvents.REQUEST_PARSING, {});
+
     try {
       const res = await agentService.processRequest(textToSubmit.trim());
       const data = res.data;
@@ -89,6 +95,16 @@ export default function Marketplace() {
       setRecommendation(data.recommendation);
       setAiSource(data.aiSource);
       setStage(2);
+
+      // Emit: parse complete + offers loaded
+      voiceEventBus.emit(VoiceEvents.PARSE_COMPLETE, {
+        serviceType: data.parsedTask?.serviceType,
+        budget: data.parsedTask?.maxBudget || data.parsedTask?.budget,
+      });
+      voiceEventBus.emit(VoiceEvents.OFFERS_LOADED, { count: (data.offers || []).length });
+
+      // Update voice context with stage
+      updateVoiceContext({ stage: 2, recommendation: data.recommendation });
     } catch (err) {
       const msg = err.message || 'Failed to analyze task with Gemini';
       setError(msg);
@@ -112,6 +128,31 @@ export default function Marketplace() {
       setPolicyResult(pResult);
       setStage(4);
       fetchPolicy();
+
+      // Emit policy result events
+      if (pResult.requiresApproval) {
+        voiceEventBus.emit(VoiceEvents.APPROVAL_REQUIRED, {
+          amount: deal.agreedAmount,
+          limit: pResult.autoApproveLimit,
+        }, { force: true });
+      } else if (pResult.allowed) {
+        voiceEventBus.emit(VoiceEvents.POLICY_PASSED, {
+          amount: deal.agreedAmount,
+          sellerName: deal.sellerAgent,
+        });
+      } else {
+        voiceEventBus.emit(VoiceEvents.POLICY_BLOCKED, {
+          reason: pResult.reason,
+          message: pResult.message,
+        }, { force: true });
+      }
+
+      // Update voice context
+      updateVoiceContext({
+        stage: 4,
+        policyResult: pResult,
+        currentDeal: deal,
+      });
     } catch (err) {
       const msg = err.message || 'Failed to create deal';
       setError(msg);
@@ -137,12 +178,20 @@ export default function Marketplace() {
           'SpendMesh AI detected and blocked an unauthorized price payload modification ($400 → $800). Order was created strictly using the server-stored agreed amount ($400).'
         );
         toast.success('Tamper attempt detected and blocked by policy guardrails');
+
+        // Emit security alert — high priority, interrupt current speech
+        voiceEventBus.emit(VoiceEvents.TAMPER_BLOCKED, {
+          submittedAmount: 800,
+          storedAmount: currentDeal.agreedAmount,
+        }, { force: true });
+
         setTimeout(() => {
           if (res.data?.approvalUrl) {
             window.location.href = res.data.approvalUrl;
           }
         }, 2200);
       } else {
+        voiceEventBus.emit(VoiceEvents.CHECKOUT_INITIATED, {});
         if (res.data?.approvalUrl) {
           window.location.href = res.data.approvalUrl;
         } else {
