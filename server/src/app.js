@@ -1,8 +1,11 @@
 require('dotenv').config();
 
 // ─── Environment Validation ───────────────────────────────────────
+if (!process.env.PORT) {
+  process.env.PORT = '5000';
+}
+
 const requiredVars = [
-  'PORT',
   'MONGODB_URI',
   'PAYPAL_CLIENT_ID',
   'PAYPAL_CLIENT_SECRET',
@@ -49,9 +52,25 @@ const PORT = process.env.PORT || 5000;
 // 1. Security headers
 app.use(helmet());
 
-// 2. CORS — restrict to frontend URL
+// 2. CORS — allow configured frontend URL(s) and Vercel deployments
+const configuredOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map(url => url.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (
+      configuredOrigins.length === 0 ||
+      configuredOrigins.includes(origin) ||
+      configuredOrigins.includes('*') ||
+      origin.endsWith('.vercel.app')
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 
