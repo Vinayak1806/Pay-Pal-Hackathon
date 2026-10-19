@@ -122,18 +122,18 @@ export default function Sidebar({ isOpen, onClose }) {
 
             <button
               onClick={onClose}
-              className="p-1.5 text-[#475467] hover:text-[#101828] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#D0D5DD] hover:border-[#98A2B3] rounded-lg transition-all shadow-2xs hover:shadow-xs active:scale-95 flex items-center justify-center group"
-              title="Close sidebar"
-              aria-label="Close sidebar"
+              className="p-2 text-[#64748B] hover:text-[#2563EB] hover:bg-[#F1F5F9] active:bg-[#E2E8F0] rounded-lg transition-all flex items-center justify-center group"
+              title="Collapse sidebar"
+              aria-label="Collapse sidebar"
             >
-              <PanelLeftClose className="w-4 h-4 stroke-[2.2] text-[#475467] group-hover:text-[#101828] transition-colors" />
+              <PanelLeftClose className="w-[18px] h-[18px] stroke-[2] transition-transform group-hover:-translate-x-0.5" />
             </button>
           </div>
 
           {/* Understated Environment Badge */}
           <div className="px-4 py-2.5">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0FDF4] border border-[#BBF7D0] text-[12px] font-semibold text-[#15803D] w-full shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#15803D]" />
+              <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
               <span className="truncate">PayPal Sandbox v2</span>
             </div>
           </div>
