@@ -374,8 +374,52 @@ function generateFallbackDeliverable(serviceType, requirements) {
   };
 }
 
+async function answerAssistantQuery(query, context = {}) {
+  const { policy, currentDeal, currentPath } = context;
+
+  const total = Number(policy?.totalBudget) || 5000;
+  const spent = Number(policy?.spentAmount) || 0;
+  const committed = Number(policy?.committedAmount) || 0;
+  const remaining = Math.max(0, total - spent - committed);
+
+  const prompt = `You are SpendMesh AI Financial Security Guide — an executive autonomous agent spending policy co-pilot built on PayPal Orders v2 Sandbox.
+Your goal is to give a concise (1 to 2 short sentences, under 35 words), authoritative, and helpful answer suitable for text-to-speech.
+Never use markdown asterisks, bolding, bullet points, or emoji in your response. Keep it clear, natural, and direct.
+
+Current App State:
+- Current Page: ${currentPath || '/'}
+- Total Budget: $${total.toFixed(2)}
+- Available Balance: $${remaining.toFixed(2)}
+- Spent Amount: $${spent.toFixed(2)}
+- Auto-Approve Ceiling: $${policy?.autoApproveLimit || 1000}
+- Allowed Services: ${policy?.allowedServices?.join(', ') || 'presentation, research, website, content, design'}
+${currentDeal ? `- Active Deal: ${currentDeal.serviceType} ($${currentDeal.agreedAmount || currentDeal.price}) with ${currentDeal.sellerAgent}` : ''}
+
+User Question: "${query}"
+
+Respond concisely in 1-2 spoken sentences:`;
+
+  try {
+    const raw = await callGeminiWithTimeout(prompt, 9000);
+    const cleaned = stripHtmlTags(raw).replace(/[*_#`~]/g, '').trim();
+    return {
+      success: true,
+      response: cleaned,
+      source: 'gemini'
+    };
+  } catch (error) {
+    console.warn('Gemini assistant query fallback:', error.message);
+    return {
+      success: true,
+      response: `Under our PayPal Sandbox policy, you have $${remaining.toFixed(2)} available with an automatic approval limit of $${policy?.autoApproveLimit || 1000}.`,
+      source: 'fallback'
+    };
+  }
+}
+
 module.exports = {
   parseTask,
   compareOffers,
-  generateDeliverable
+  generateDeliverable,
+  answerAssistantQuery
 };

@@ -1,10 +1,12 @@
-import React from 'react';
-import { X, ShieldCheck, Printer, CheckCircle, Copy, Award, Check, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ShieldCheck, Printer, CheckCircle, Copy, Award, Check, FileText, Download, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { printReceiptDocument } from '../utils/printReceipt';
+import { printReceiptDocument, downloadReceiptPdf } from '../utils/printReceipt';
 
 export default function ReceiptModal({ isOpen, onClose, data }) {
   if (!isOpen || !data) return null;
+
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const {
     orderId = 'N/A',
@@ -27,6 +29,19 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
 
   const handlePrint = () => {
     printReceiptDocument(data);
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloading(true);
+      toast.loading('Generating certified PDF receipt...', { id: 'pdf-gen' });
+      await downloadReceiptPdf(data);
+      toast.success('PDF Receipt downloaded successfully!', { id: 'pdf-gen' });
+    } catch (err) {
+      toast.error('Failed to generate PDF. You can also use Print to Save as PDF.', { id: 'pdf-gen' });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleCopyHash = () => {
@@ -307,13 +322,33 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
             Close Window
           </button>
 
-          <button
-            onClick={handlePrint}
-            className="px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-semibold rounded-lg shadow-xs flex items-center gap-2 transition-colors"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Print Official Receipt</span>
-          </button>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={isDownloading}
+              className="px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] border border-[#D0D5DD] text-[13px] font-semibold rounded-lg shadow-xs flex items-center gap-2 transition-colors disabled:opacity-60"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
+                  <span>Downloading...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 text-[#2563EB]" />
+                  <span>Download PDF</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-semibold rounded-lg shadow-xs flex items-center gap-2 transition-colors"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Print Official Receipt</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

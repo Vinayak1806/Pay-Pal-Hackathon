@@ -1,12 +1,14 @@
+import html2pdf from 'html2pdf.js';
+
 /**
- * Print Utility — SpendMesh AI
+ * Print & PDF Export Utility — SpendMesh AI
  * 
  * Generates an isolated, executive-grade corporate financial receipt and compliance
- * certificate in a dedicated hidden iframe. This guarantees 100% reliable rendering
- * across all browsers without CSS inheritance bugs or blank preview pages.
+ * certificate. Supports direct printing via isolated iframe or 1-click PDF download
+ * via html2pdf.js.
  */
 
-export function printReceiptDocument(data = {}) {
+export function buildReceiptHtml(data = {}) {
   const {
     orderId = 'N/A',
     captureId = 'N/A',
@@ -31,19 +33,7 @@ export function printReceiptDocument(data = {}) {
     timeStyle: 'medium'
   });
 
-  // Create isolated hidden iframe for printing
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(`
+  return `
     <!DOCTYPE html>
     <html lang="en">
       <head>
@@ -459,7 +449,23 @@ export function printReceiptDocument(data = {}) {
         </div>
       </body>
     </html>
-  `);
+  `;
+}
+
+export function printReceiptDocument(data = {}) {
+  const html = buildReceiptHtml(data);
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
   doc.close();
 
   iframe.contentWindow.focus();
@@ -471,4 +477,37 @@ export function printReceiptDocument(data = {}) {
       }
     }, 1500);
   }, 250);
+}
+
+export async function downloadReceiptPdf(data = {}) {
+  const { orderId = 'TXN' } = data;
+  const fileName = `SpendMesh_Receipt_${(orderId || 'TXN').slice(-8).toUpperCase()}.pdf`;
+  const html = buildReceiptHtml(data);
+
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '780px';
+  container.style.background = '#FFFFFF';
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  const target = container.querySelector('.receipt-container') || container;
+
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  try {
+    await html2pdf().set(opt).from(target).save();
+  } finally {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
+  }
 }

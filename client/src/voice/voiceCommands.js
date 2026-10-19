@@ -233,13 +233,51 @@ export function processCommand(rawInput, context = {}) {
     return { response: answerScripts.EXPLAIN_OFFER({ offer: currentDeal, recommendation }), navigated: false };
   }
 
-  // ── 14. Check budget ────────────────────────────────────────────
+  // ── 14. Check budget / Treasury balance ─────────────────────────
+  if (
+    normalized.includes('treasury') ||
+    normalized.includes('treasury balance') ||
+    normalized === 'check treasury balance'
+  ) {
+    return { response: answerScripts.CHECK_TREASURY_BALANCE({ policy }), navigated: false };
+  }
+
   if (
     normalized.includes('budget') ||
     normalized.includes('how much') && (normalized.includes('left') || normalized.includes('remaining') || normalized.includes('available')) ||
     normalized.includes('check my balance')
   ) {
     return { response: answerScripts.CHECK_BUDGET({ policy }), navigated: false };
+  }
+
+  // ── 14b. Pending Approvals Count ────────────────────────────────
+  if (
+    normalized.includes('pending approval') ||
+    normalized.includes('approvals count') ||
+    normalized.includes('how many approval') ||
+    normalized === 'pending approvals count'
+  ) {
+    return { response: answerScripts.PENDING_APPROVALS_COUNT({ pendingApprovals, approvedDeals }), navigated: false };
+  }
+
+  // ── 14c. Explain PayPal Escrow ──────────────────────────────────
+  if (
+    normalized.includes('escrow') ||
+    normalized.includes('paypal escrow') ||
+    normalized === 'explain paypal escrow'
+  ) {
+    return { response: answerScripts.EXPLAIN_PAYPAL_ESCROW(), navigated: false };
+  }
+
+  // ── 14d. Summarize Today's Spend ────────────────────────────────
+  if (
+    normalized.includes('summarize today') ||
+    normalized.includes('summarize spend') ||
+    normalized.includes('today\'s spend') ||
+    normalized.includes('todays spend') ||
+    normalized === 'summarize today\'s spend'
+  ) {
+    return { response: answerScripts.SUMMARIZE_TODAYS_SPEND({ policy, deals: context.deals }), navigated: false };
   }
 
   // ── 15. What is happening / recent events ──────────────────────
@@ -279,8 +317,12 @@ export function processCommand(rawInput, context = {}) {
     };
   }
 
-  // ── 18. Fallback ─────────────────────────────────────────────────
-  return { response: answerScripts.UNSUPPORTED({ command: rawInput }), navigated: false };
+  // ── 18. Fallback (routes to Gemini generative intelligence) ───────
+  return {
+    response: answerScripts.UNSUPPORTED({ command: rawInput }),
+    navigated: false,
+    isFallback: true
+  };
 }
 
 export default processCommand;

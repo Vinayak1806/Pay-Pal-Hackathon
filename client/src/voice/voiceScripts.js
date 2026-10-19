@@ -181,6 +181,31 @@ export const answerScripts = {
       `Your automatic approval ceiling is $${policy.autoApproveLimit || 1000}.`;
   },
 
+  CHECK_TREASURY_BALANCE: ({ policy } = {}) => {
+    const total = policy?.totalBudget || 5000;
+    const spent = policy?.spentAmount || 0;
+    const committed = policy?.committedAmount || 0;
+    const remaining = Math.max(0, total - spent - committed);
+    return `Treasury balance: $${remaining.toFixed(2)} USD available out of $${total.toFixed(2)}. Spent: $${spent.toFixed(2)}, Committed: $${committed.toFixed(2)}.`;
+  },
+
+  PENDING_APPROVALS_COUNT: ({ pendingApprovals = 0, approvedDeals = 0 } = {}) => {
+    const total = (Number(pendingApprovals) || 0) + (Number(approvedDeals) || 0);
+    if (total === 0) {
+      return `You have 0 pending approvals. All agent transactions and requests are fully settled.`;
+    }
+    return `You have ${total} actionable item${total > 1 ? 's' : ''}: ${pendingApprovals} pending review, and ${approvedDeals} authorized for checkout.`;
+  },
+
+  EXPLAIN_PAYPAL_ESCROW: () =>
+    `SpendMesh acts as an autonomous policy escrow on top of PayPal Orders v2. Deals are bound to strict price ceilings, reserved against treasury capacity, and captured on PayPal Sandbox only after guardrail compliance and deliverable generation.`,
+
+  SUMMARIZE_TODAYS_SPEND: ({ policy, deals } = {}) => {
+    const spent = policy?.spentAmount || 0;
+    const count = Array.isArray(deals) ? deals.filter(d => d.status === 'payment_completed').length : 0;
+    return `Total settled spending is $${Number(spent).toFixed(2)} USD across ${count} verified transaction${count !== 1 ? 's' : ''}.`;
+  },
+
   WHAT_HAPPENED: ({ lastEvent } = {}) => {
     if (!lastEvent) return `No recent security or payment events have been recorded in this session.`;
     return `The most recent event was: ${lastEvent.type?.replace(/_/g, ' ').toLowerCase()}. ` +

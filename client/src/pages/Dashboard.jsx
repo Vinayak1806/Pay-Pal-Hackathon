@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { dealService, policyService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import DeliverableModal from '../components/DeliverableModal';
+import ReceiptModal from '../components/ReceiptModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import {
   RotateCcw,
@@ -17,7 +18,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  FileText
+  FileText,
+  Printer
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -30,10 +32,12 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // Selected deal for Deliverable / Lifecycle modal
+  // Selected deal for Deliverable / Lifecycle / Receipt modal
   const [selectedDealForModal, setSelectedDealForModal] = useState(null);
   const [isDeliverableOpen, setIsDeliverableOpen] = useState(false);
   const [selectedLifecycleDeal, setSelectedLifecycleDeal] = useState(null);
+  const [selectedDealForReceipt, setSelectedDealForReceipt] = useState(null);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -198,6 +202,7 @@ export default function Dashboard() {
                   <th className="py-3.5 px-4">PayPal Order</th>
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4 text-center">Lifecycle</th>
+                  <th className="py-3.5 px-4 text-center">Receipt</th>
                   <th className="py-3.5 px-4 text-right">Artifact</th>
                 </tr>
               </thead>
@@ -232,6 +237,32 @@ export default function Dashboard() {
                       >
                         Inspect
                       </button>
+                    </td>
+                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                      {deal.status === 'payment_completed' ? (
+                        <button
+                          onClick={() => {
+                            setSelectedDealForReceipt({
+                              orderId: deal.paypalOrderId || deal.dealId,
+                              captureId: deal.paypalCaptureId || deal.dealId,
+                              amount: deal.agreedAmount,
+                              currency: 'USD',
+                              serviceType: deal.serviceType,
+                              sellerAgent: deal.sellerAgent,
+                              deliverable: deal.deliverable,
+                              timestamp: deal.updatedAt || deal.createdAt
+                            });
+                            setIsReceiptOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-[12px] font-semibold text-[#1E40AF] hover:text-[#1E3A8A] bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#BFDBFE] rounded-md transition-colors shadow-2xs"
+                          title="View and print official certified receipt"
+                        >
+                          <Printer className="w-3.5 h-3.5 text-[#2563EB]" />
+                          <span>Receipt</span>
+                        </button>
+                      ) : (
+                        <span className="text-[#98A2B3] text-[13px]">—</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       {deal.status === 'payment_completed' && deal.deliverable ? (
@@ -384,6 +415,16 @@ export default function Dashboard() {
         deal={selectedDealForModal}
         isOpen={isDeliverableOpen}
         onClose={() => setIsDeliverableOpen(false)}
+      />
+
+      {/* Official Receipt Modal */}
+      <ReceiptModal
+        isOpen={isReceiptOpen}
+        onClose={() => {
+          setIsReceiptOpen(false);
+          setSelectedDealForReceipt(null);
+        }}
+        data={selectedDealForReceipt}
       />
     </div>
   );

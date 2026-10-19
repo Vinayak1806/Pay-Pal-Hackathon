@@ -43,6 +43,10 @@ export const agentService = {
       : { userInput };
     const res = await api.post('/agents/request', payload);
     return res.data;
+  },
+  chat: async (query, context = {}) => {
+    const res = await api.post('/agents/chat', { query, context });
+    return res.data;
   }
 };
 

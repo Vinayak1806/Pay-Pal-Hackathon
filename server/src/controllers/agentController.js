@@ -63,6 +63,26 @@ async function handleRequest(req, res, next) {
   }
 }
 
+async function handleChat(req, res, next) {
+  try {
+    const { query, context } = req.body;
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'query is required', code: 'INVALID_QUERY' }
+      });
+    }
+
+    const { answerAssistantQuery } = require('../services/geminiService');
+    const result = await answerAssistantQuery(query.trim(), context || {});
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
-  handleRequest
+  handleRequest,
+  handleChat
 };

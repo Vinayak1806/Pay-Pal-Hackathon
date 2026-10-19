@@ -28,6 +28,13 @@ import { processCommand } from './voiceCommands';
 import { narrationScripts, quickActionsForPage } from './voiceScripts';
 import voiceEventBus, { VoiceEvents } from './voiceEventBus';
 import { useVoiceContext } from '../context/VoiceContext';
+import { agentService } from '../services/api';
+import {
+  playSuccessChime,
+  playAlertChime,
+  playShieldBlockedChime,
+  playAssistantOpenChime
+} from '../utils/audioChimes';
 
 // ─── Conversation Message Types ────────────────────────────────
 const MSG = {
@@ -44,6 +51,20 @@ function Message({ msg }) {
     return (
       <div className="text-center text-[11px] text-[#94A3B8] italic py-1">
         {msg.text}
+      </div>
+    );
+  }
+
+  if (msg.isThinking) {
+    return (
+      <div className="flex gap-2 items-start">
+        <div className="w-6 h-6 rounded-full bg-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 animate-pulse">
+          <Shield className="w-3 h-3 text-white" />
+        </div>
+        <div className="rounded-xl px-3 py-2 text-[12px] bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] flex items-center gap-1.5 italic">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-ping" />
+          <span>Consulting Gemini 2.5 Flash...</span>
+        </div>
       </div>
     );
   }
@@ -71,7 +92,7 @@ function Message({ msg }) {
 export default function VoiceAssistant() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { voiceAppContext, assistantOpen, closeAssistant, openAssistant, toggleAssistant } = useVoiceContext();
+  const { voiceAppContext, assistantOpen, closeAssistant, openAssistant, toggleAssistant, setIsSpeaking: setContextSpeaking, setIsListening: setContextListening } = useVoiceContext();
 
   const {
     canSpeak, canListen,
@@ -81,6 +102,15 @@ export default function VoiceAssistant() {
     startListening, stopListening,
     clearError, clearTranscript,
   } = useVoice();
+
+  // Sync speaking & listening state to global context for VoiceButton
+  useEffect(() => {
+    if (setContextSpeaking) setContextSpeaking(isSpeaking);
+  }, [isSpeaking, setContextSpeaking]);
+
+  useEffect(() => {
+    if (setContextListening) setContextListening(isListening);
+  }, [isListening, setContextListening]);
 
   // Conversation history
   const [messages, setMessages] = useState([{
@@ -157,6 +187,29 @@ export default function VoiceAssistant() {
       return;
     }
 
+    // Generative AI Fallback via Gemini 2.5 Flash
+    if (result.isFallback) {
+      const thinkingId = `msg-ai-${Date.now()}`;
+      setMessages(prev => [
+        ...prev,
+        { id: thinkingId, role: MSG.ASSISTANT, text: 'Thinking...', isThinking: true }
+      ]);
+
+      agentService.chat(input, {
+        currentPath: location.pathname,
+        ...voiceAppContext
+      }).then((res) => {
+        const text = res?.response || result.response;
+        setMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, text, isThinking: false } : m));
+        playAssistantOpenChime();
+        speak(text, { priority: 1 });
+      }).catch(() => {
+        setMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, text: result.response, isThinking: false } : m));
+        speak(result.response, { priority: 1 });
+      });
+      return;
+    }
+
     // Normal answer
     addMessage(MSG.ASSISTANT, result.response);
     speak(result.response, { priority: 1 });
@@ -170,6 +223,7 @@ export default function VoiceAssistant() {
     if (isListening) {
       stopListening();
     } else {
+      playAssistantOpenChime();
       startListening((recognized) => {
         handleUserInput(recognized);
       });
@@ -297,6 +351,19 @@ export default function VoiceAssistant() {
         const text = scriptFn(event);
         if (!text) return;
 
+        // Acoustic sound FX for key platform events
+        if (eventType === VoiceEvents.CAPTURE_VERIFIED || eventType === VoiceEvents.APPROVAL_GRANTED) {
+          playSuccessChime();
+        } else if (eventType === VoiceEvents.APPROVAL_REQUIRED) {
+          playAlertChime();
+        } else if (
+          eventType === VoiceEvents.POLICY_BLOCKED ||
+          eventType === VoiceEvents.TAMPER_BLOCKED ||
+          eventType === VoiceEvents.DUPLICATE_BLOCKED
+        ) {
+          playShieldBlockedChime();
+        }
+
         addMessage(MSG.ASSISTANT, text);
         speak(text, { priority, interruptCurrent: priority >= 2 });
         // Never auto-open chat box: strictly user-initiated via floating button
@@ -346,10 +413,36 @@ export default function VoiceAssistant() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0] bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] text-white shrink-0">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isSpeaking ? 'bg-green-300 animate-pulse' : isListening ? 'bg-yellow-300 animate-pulse' : 'bg-white/50'}`} />
-          <span className="font-semibold text-[13px]">Security Guide</span>
-          {isSpeaking && <span className="text-[10px] text-blue-200 font-medium">Speaking...</span>}
-          {isListening && <span className="text-[10px] text-yellow-200 font-medium animate-pulse">Listening...</span>}
+          {isSpeaking ? (
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-[2px] h-4 px-0.5">
+                <span className="w-[2.5px] h-3 rounded-full bg-green-200 animate-waveform-1" />
+                <span className="w-[2.5px] h-3.5 rounded-full bg-white animate-waveform-2" />
+                <span className="w-[2.5px] h-4 rounded-full bg-green-100 animate-waveform-3" />
+                <span className="w-[2.5px] h-3 rounded-full bg-white animate-waveform-4" />
+                <span className="w-[2.5px] h-2.5 rounded-full bg-green-300 animate-waveform-5" />
+              </div>
+              <span className="font-semibold text-[13px]">Security Guide</span>
+              <span className="text-[10px] text-green-200 font-medium tracking-wide">Speaking...</span>
+            </div>
+          ) : isListening ? (
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-[2px] h-4 px-0.5">
+                <span className="w-[2.5px] h-3 rounded-full bg-amber-200 animate-waveform-1" />
+                <span className="w-[2.5px] h-3.5 rounded-full bg-white animate-waveform-2" />
+                <span className="w-[2.5px] h-4 rounded-full bg-yellow-200 animate-waveform-3" />
+                <span className="w-[2.5px] h-3 rounded-full bg-white animate-waveform-4" />
+                <span className="w-[2.5px] h-2.5 rounded-full bg-amber-300 animate-waveform-5" />
+              </div>
+              <span className="font-semibold text-[13px]">Security Guide</span>
+              <span className="text-[10px] text-yellow-200 font-medium animate-pulse tracking-wide">Listening...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-white/70" />
+              <span className="font-semibold text-[13px]">Security Guide</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-1">
@@ -428,17 +521,40 @@ export default function VoiceAssistant() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── Quick actions ──────────────────────────────────────── */}
-      <div className="px-3 py-2 border-t border-[#E2E8F0] flex flex-wrap gap-1.5 shrink-0 bg-[#FAFAFD]">
-        {currentQuickActions.map((action) => (
+      {/* ── Sleek Horizontal Prompt Pills (Single Row) ─────────── */}
+      <div className="px-3 py-1.5 border-t border-[#F1F5F9] bg-[#FAFAFD] shrink-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           <button
-            key={action.command}
-            onClick={() => handleUserInput(action.command)}
-            className="text-[11px] px-2.5 py-1 rounded-full border border-[#BFDBFE] bg-[#EFF4FF] text-[#2563EB] hover:bg-[#DBEAFE] hover:border-[#93C5FD] transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            onClick={() => handleUserInput('Check Treasury Balance')}
+            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
           >
-            {action.label}
+            <span>💳</span> Treasury Balance
           </button>
-        ))}
+          <button
+            onClick={() => handleUserInput('Pending Approvals Count')}
+            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
+          >
+            <span>⏳</span> Pending Approvals
+          </button>
+          <button
+            onClick={() => handleUserInput('Explain PayPal Escrow')}
+            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
+          >
+            <span>🛡️</span> PayPal Escrow
+          </button>
+          <button
+            onClick={() => handleUserInput("Summarize Today's Spend")}
+            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
+          >
+            <span>📊</span> Today's Spend
+          </button>
+          <button
+            onClick={() => handleUserInput('What should I do next?')}
+            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
+          >
+            <span>💡</span> Next Step
+          </button>
+        </div>
       </div>
 
       {/* ── Input area ─────────────────────────────────────────── */}

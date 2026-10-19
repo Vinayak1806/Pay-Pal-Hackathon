@@ -10,12 +10,14 @@ import {
   ShieldCheck,
   Copy,
   Check,
-  Printer
+  Printer,
+  Download,
+  Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReceiptModal from '../components/ReceiptModal';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
-import { printReceiptDocument } from '../utils/printReceipt';
+import { printReceiptDocument, downloadReceiptPdf } from '../utils/printReceipt';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -27,6 +29,7 @@ export default function PaymentSuccess() {
   const [captureData, setCaptureData] = useState(null);
   const [showReceipt, setShowReceipt] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -285,6 +288,44 @@ export default function PaymentSuccess() {
           >
             <Printer className="w-4 h-4" />
             <span>Print Official Receipt</span>
+          </button>
+
+          <button
+            onClick={async () => {
+              try {
+                setIsDownloadingPdf(true);
+                toast.loading('Generating certified PDF receipt...', { id: 'pdf-dl' });
+                await downloadReceiptPdf({
+                  orderId: token,
+                  captureId: captureData?.captureId,
+                  amount: captureData?.amount,
+                  currency: captureData?.currency || 'USD',
+                  serviceType: captureData?.serviceType || 'Presentation & Pitch Deck',
+                  sellerAgent: captureData?.sellerAgent || 'SlideForge AI (SpendMesh Verified Agent)',
+                  deliverable: deliverable,
+                  timestamp: new Date()
+                });
+                toast.success('PDF Receipt downloaded successfully!', { id: 'pdf-dl' });
+              } catch (err) {
+                toast.error('Failed to export PDF. Use Print to Save as PDF.', { id: 'pdf-dl' });
+              } finally {
+                setIsDownloadingPdf(false);
+              }
+            }}
+            disabled={isDownloadingPdf}
+            className="w-full sm:w-auto px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+          >
+            {isDownloadingPdf ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
+                <span>Downloading...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 text-[#2563EB]" />
+                <span>Download PDF</span>
+              </>
+            )}
           </button>
 
           <button

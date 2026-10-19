@@ -686,7 +686,7 @@ export default function Marketplace() {
                   }}
                   className="px-4 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-[13px] rounded-lg shadow-xs transition-colors flex items-center gap-1.5"
                 >
-                  <Plus className="w-4 h-4" /> + New Request
+                  <Plus className="w-4 h-4" /> New Request
                 </button>
               </div>
             </div>

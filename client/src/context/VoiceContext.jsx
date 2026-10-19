@@ -10,8 +10,9 @@
  * This keeps voice concern separate from page logic.
  */
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
+import { policyService, dealService } from '../services/api';
 
 const VoiceContext = createContext(null);
 
@@ -23,14 +24,38 @@ export function VoiceProvider({ children }) {
     policy: null,
     policyResult: null,
     currentDeal: null,
+    deals: [],
     captureData: null,
     recommendation: null,
     pendingApprovals: 0,
+    approvedDeals: 0,
     lastEvent: null,
   });
 
   // Is the assistant panel open?
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  // Initial load of policy and deals to ensure assistant knows live balances
+  useEffect(() => {
+    Promise.all([
+      policyService.getPolicy().catch(() => null),
+      dealService.getDeals().catch(() => null)
+    ]).then(([policyRes, dealsRes]) => {
+      const policy = policyRes?.data?.policy;
+      const deals = dealsRes?.data?.deals || [];
+      const pendingApprovals = deals.filter(d => d.status === 'pending_approval').length;
+      const approvedDeals = deals.filter(d => d.status === 'approved').length;
+      setVoiceAppContext(prev => ({
+        ...prev,
+        policy: policy || prev.policy,
+        deals,
+        pendingApprovals,
+        approvedDeals
+      }));
+    });
+  }, []);
 
   // Track the last security event text for repeat command
   const lastSecurityEventRef = useRef(null);
@@ -71,6 +96,10 @@ export function VoiceProvider({ children }) {
       openAssistant,
       closeAssistant,
       toggleAssistant,
+      isSpeaking,
+      setIsSpeaking,
+      isListening,
+      setIsListening,
       VoiceEvents,
       lastSecurityEventRef,
     }}>

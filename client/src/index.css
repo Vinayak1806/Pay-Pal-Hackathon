@@ -59,6 +59,15 @@
   background: #98A2B3;
 }
 
+/* Hide scrollbar for clean horizontal pill carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Print Styles: Pure, Isolated, Executive Corporate Receipt */
 @media print {
   @page {
@@ -104,4 +113,42 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+}
+
+/* ─── Audio Waveform Visualizer Animations ──────────────────────── */
+@keyframes waveform {
+  0%, 100% {
+    transform: scaleY(0.2);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.animate-waveform-1 {
+  animation: waveform 0.75s ease-in-out infinite;
+  animation-delay: 0s;
+  transform-origin: center;
+}
+.animate-waveform-2 {
+  animation: waveform 0.75s ease-in-out infinite;
+  animation-delay: 0.15s;
+  transform-origin: center;
+}
+.animate-waveform-3 {
+  animation: waveform 0.75s ease-in-out infinite;
+  animation-delay: 0.3s;
+  transform-origin: center;
+}
+.animate-waveform-4 {
+  animation: waveform 0.75s ease-in-out infinite;
+  animation-delay: 0.12s;
+  transform-origin: center;
+}
+.animate-waveform-5 {
+  animation: waveform 0.75s ease-in-out infinite;
+  animation-delay: 0.24s;
+  transform-origin: center;
 }
