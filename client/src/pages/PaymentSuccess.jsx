@@ -9,11 +9,13 @@ import {
   ArrowRight,
   ShieldCheck,
   Copy,
-  Check
+  Check,
+  Printer
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReceiptModal from '../components/ReceiptModal';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
+import { printReceiptDocument } from '../utils/printReceipt';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -265,24 +267,45 @@ export default function PaymentSuccess() {
 
       {/* Navigation & Receipt Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-        <button
-          onClick={() => setShowReceipt(true)}
-          className="w-full sm:w-auto px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F7F8FA] text-[#171A21] font-medium text-[13px] rounded-lg border border-[#E6E8EC] shadow-xs flex items-center justify-center gap-2 transition-colors"
-        >
-          <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
-          <span>View Verified Audit Certificate</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={() => {
+              printReceiptDocument({
+                orderId: token,
+                captureId: captureData?.captureId,
+                amount: captureData?.amount,
+                currency: captureData?.currency || 'USD',
+                serviceType: captureData?.serviceType || 'Presentation & Pitch Deck',
+                sellerAgent: captureData?.sellerAgent || 'SlideForge AI (SpendMesh Verified Agent)',
+                deliverable: deliverable,
+                timestamp: new Date()
+              });
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-[13px] rounded-lg shadow-xs flex items-center justify-center gap-2 transition-colors"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print Official Receipt</span>
+          </button>
+
+          <button
+            onClick={() => setShowReceipt(true)}
+            className="w-full sm:w-auto px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] shadow-xs flex items-center justify-center gap-2 transition-colors"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+            <span>View Audit Certificate</span>
+          </button>
+        </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <Link
             to="/transactions"
-            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#FFFFFF] border border-[#E6E8EC] text-[#667085] hover:text-[#171A21] font-medium text-[13px] rounded-lg hover:bg-[#F7F8FA] shadow-xs text-center transition-colors"
+            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#FFFFFF] border border-[#D0D5DD] text-[#475467] hover:text-[#101828] font-semibold text-[13px] rounded-lg hover:bg-[#F8FAFC] shadow-xs text-center transition-colors"
           >
             Transactions Ledger
           </Link>
           <Link
             to="/requests"
-            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[13px] rounded-lg shadow-xs flex items-center justify-center gap-1.5 transition-colors"
+            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#101828] hover:bg-black text-white font-semibold text-[13px] rounded-lg shadow-xs flex items-center justify-center gap-1.5 transition-colors"
           >
             <span>New Request</span>
             <ArrowRight className="w-4 h-4" />
@@ -298,7 +321,8 @@ export default function PaymentSuccess() {
           captureId: captureData?.captureId,
           amount: captureData?.amount,
           currency: captureData?.currency || 'USD',
-          serviceType: 'Presentation & Pitch Deck',
+          serviceType: captureData?.serviceType || 'Presentation & Pitch Deck',
+          sellerAgent: captureData?.sellerAgent || 'SlideForge AI (SpendMesh Verified Agent)',
           deliverable: deliverable,
           timestamp: new Date()
         }}

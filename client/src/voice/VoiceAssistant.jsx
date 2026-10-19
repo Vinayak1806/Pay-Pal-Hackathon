@@ -185,20 +185,94 @@ export default function VoiceAssistant() {
     handleUserInput(input);
   };
 
-  // ── Welcome narration on first open ─────────────────────────────
+  // ── First-time visitor welcome narration (does NOT trigger on refresh) ──
   useEffect(() => {
-    if (assistantOpen && isFirstOpenRef.current && !welcomeSpokenRef.current) {
-      isFirstOpenRef.current = false;
-      welcomeSpokenRef.current = true;
+    // Clear legacy permanent localStorage flag from prior builds so it doesn't block repeat visits
+    try {
+      localStorage.removeItem('spendmesh_welcomed_first_time');
+    } catch (e) {}
 
-      const welcomeText = narrationScripts.WELCOME();
-      addMessage(MSG.ASSISTANT, welcomeText);
-      // Brief delay to allow browser speech to initialize
-      setTimeout(() => {
-        if (!isMuted) speak(welcomeText, { priority: 0 });
-      }, 600);
+    // Check if current browser session was already welcomed
+    const sessionWelcomed = sessionStorage.getItem('spendmesh_session_welcomed');
+
+    // Check if current page load is a browser reload (F5 / reload button)
+    const navEntry = performance.getEntriesByType?.('navigation')?.[0];
+    const isPageReload = navEntry ? navEntry.type === 'reload' : (window.performance?.navigation?.type === 1);
+
+    if (sessionWelcomed === 'true' || isPageReload) {
+      try {
+        sessionStorage.setItem('spendmesh_session_welcomed', 'true');
+      } catch (e) {}
+      return; // Do NOT trigger on refresh or within the same active tab session
     }
-  }, [assistantOpen, isMuted, speak, addMessage]);
+
+    // Mark current visit session as welcomed
+    try {
+      sessionStorage.setItem('spendmesh_session_welcomed', 'true');
+    } catch (e) {}
+
+    const welcomeText = narrationScripts.WELCOME();
+    addMessage(MSG.ASSISTANT, welcomeText);
+
+    let spoken = false;
+
+    const playWelcomeSpeech = (fromUserInteraction = false) => {
+      if (spoken) return;
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.resume();
+        } catch (e) {}
+      }
+      if (!isMuted) {
+        speak(welcomeText, { priority: 0 });
+      }
+      if (fromUserInteraction) {
+        spoken = true;
+        removeListeners();
+      }
+    };
+
+    const handleUserInteraction = () => {
+      if (spoken) {
+        removeListeners();
+        return;
+      }
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.resume();
+        } catch (e) {}
+      }
+      if (!window.speechSynthesis?.speaking) {
+        playWelcomeSpeech(true);
+      } else {
+        spoken = true;
+        removeListeners();
+      }
+    };
+
+    const removeListeners = () => {
+      window.removeEventListener('click', handleUserInteraction, true);
+      window.removeEventListener('pointerdown', handleUserInteraction, true);
+      window.removeEventListener('keydown', handleUserInteraction, true);
+    };
+
+    // 1. Attempt automatic speech after 600ms
+    const timer = setTimeout(() => {
+      if (!spoken) {
+        playWelcomeSpeech(false);
+      }
+    }, 600);
+
+    // 2. Fallback for browsers (Chrome/Brave) that block audio autoplay until user gesture
+    window.addEventListener('click', handleUserInteraction, { capture: true, once: true });
+    window.addEventListener('pointerdown', handleUserInteraction, { capture: true, once: true });
+    window.addEventListener('keydown', handleUserInteraction, { capture: true, once: true });
+
+    return () => {
+      clearTimeout(timer);
+      removeListeners();
+    };
+  }, [isMuted, speak, addMessage]);
 
   // ── Subscribe to voiceEventBus events ───────────────────────────
   useEffect(() => {
@@ -225,11 +299,7 @@ export default function VoiceAssistant() {
 
         addMessage(MSG.ASSISTANT, text);
         speak(text, { priority, interruptCurrent: priority >= 2 });
-
-        // Auto-open panel for important events
-        if (priority >= 1) {
-          openAssistant();
-        }
+        // Never auto-open chat box: strictly user-initiated via floating button
       };
       const unsub = voiceEventBus.on(eventType, handler);
       handlers.push(unsub);

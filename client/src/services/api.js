@@ -37,8 +37,11 @@ api.interceptors.response.use(
 );
 
 export const agentService = {
-  processRequest: async (userInput) => {
-    const res = await api.post('/agents/request', { userInput });
+  processRequest: async (userInput, customParsedTask = null, existingTaskId = null) => {
+    const payload = customParsedTask
+      ? { parsedTask: customParsedTask, taskId: existingTaskId }
+      : { userInput };
+    const res = await api.post('/agents/request', payload);
     return res.data;
   }
 };

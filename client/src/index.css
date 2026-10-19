@@ -59,23 +59,49 @@
   background: #98A2B3;
 }
 
-/* Print Styles: Isolate receipts/certificates, hide app chrome completely */
+/* Print Styles: Pure, Isolated, Executive Corporate Receipt */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-size: 11pt !important;
+  }
+
+  /* Completely hide app chrome, sidebars, headers, voice assistants, and any screen-only elements */
   header,
   aside,
   footer,
   nav,
+  button,
   .print-hidden,
+  .print\:hidden,
   [data-print-hide],
   #voice-assistant-panel,
-  #voice-assistant-button {
+  #voice-assistant-button,
+  .toaster,
+  div[role="status"] {
     display: none !important;
   }
 
-  body {
-    background: #FFFFFF !important;
-    color: #101828 !important;
-    padding: 0 !important;
+  #root, main {
+    display: block !important;
+    width: 100% !important;
     margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

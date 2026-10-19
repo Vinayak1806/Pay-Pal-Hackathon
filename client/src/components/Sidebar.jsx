@@ -51,6 +51,7 @@ export default function Sidebar({ isOpen, onClose }) {
     setResetting(true);
     try {
       await demoService.reset();
+      localStorage.removeItem('spendmesh_welcomed_first_time');
       toast.success('Demo environment reset successfully');
       setTimeout(() => {
         window.location.reload();

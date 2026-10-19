@@ -61,13 +61,15 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link
-          to="/requests"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-semibold shadow-xs transition-colors"
-        >
-          <Plus className="w-4 h-4 stroke-[2.2]" />
-          <span>New Purchase Request</span>
-        </Link>
+        {location.pathname !== '/requests' && location.pathname !== '/marketplace' && (
+          <Link
+            to="/requests"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-semibold shadow-xs transition-colors"
+          >
+            <Plus className="w-4 h-4 stroke-[2.2]" />
+            <span>New Purchase Request</span>
+          </Link>
+        )}
       </div>
     </header>
   );

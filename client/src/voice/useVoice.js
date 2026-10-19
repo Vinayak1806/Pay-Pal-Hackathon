@@ -58,6 +58,20 @@ export function useVoice() {
     };
   }, []);
 
+  // ── Pre-load voices on voiceschanged ────────────────────────────
+  useEffect(() => {
+    if (hasSpeechSynthesis) {
+      window.speechSynthesis.getVoices();
+      const onVoicesChanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+      return () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+      };
+    }
+  }, [hasSpeechSynthesis]);
+
   // ── Internal: process speak queue ──────────────────────────────
   const _processQueue = useCallback(() => {
     if (isProcessingQueueRef.current || speakQueueRef.current.length === 0 || isMuted) {
@@ -65,6 +79,11 @@ export function useVoice() {
     }
 
     if (!hasSpeechSynthesis) return;
+
+    // Unpause speech engine if paused by browser idle timer
+    try {
+      window.speechSynthesis.resume();
+    } catch (e) {}
 
     // Sort by priority (higher first) then FIFO
     speakQueueRef.current.sort((a, b) => (b.priority || 0) - (a.priority || 0));
@@ -76,7 +95,7 @@ export function useVoice() {
     lastSpokenRef.current = text;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
+    utterance.rate = 1.08;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
     utterance.lang = 'en-US';
@@ -89,6 +108,10 @@ export function useVoice() {
     ) || voices.find(v => v.lang.startsWith('en'));
     if (preferred) utterance.voice = preferred;
 
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
     utterance.onend = () => {
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
@@ -97,7 +120,7 @@ export function useVoice() {
       setTimeout(_processQueue, 300);
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       utteranceRef.current = null;
@@ -106,7 +129,7 @@ export function useVoice() {
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
-  }, [isMuted]);
+  }, [isMuted, hasSpeechSynthesis]);
 
   // Re-process queue when mute changes
   useEffect(() => {

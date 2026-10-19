@@ -11,7 +11,12 @@ import {
   ExternalLink,
   ChevronRight,
   TrendingUp,
-  ShieldCheck
+  ShieldCheck,
+  Shield,
+  Lock,
+  Check,
+  Activity,
+  FileCheck
 } from 'lucide-react';
 import { dealService, policyService, auditService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
@@ -56,6 +61,27 @@ export default function Overview() {
   const blockedDeals = deals.filter(d => d.status === 'blocked');
   const completedDeals = deals.filter(d => d.status === 'payment_completed');
   const totalActionableApprovals = pendingDeals.length + unpaidAuthorizedDeals.length;
+
+  // Category spend metrics from settled deals
+  const categoriesList = [
+    { key: 'presentation', label: 'Presentation', color: '#2563EB' },
+    { key: 'website', label: 'Website', color: '#15803D' },
+    { key: 'research', label: 'Research', color: '#7C3AED' },
+    { key: 'content', label: 'Content', color: '#D97706' },
+    { key: 'design', label: 'Design', color: '#059669' }
+  ];
+
+  const categoryMetrics = categoriesList.map(cat => {
+    const catDeals = deals.filter(d => d.serviceType === cat.key && (d.status === 'payment_completed' || d.status === 'approved'));
+    const catSpent = catDeals.reduce((sum, d) => sum + (Number(d.agreedAmount) || 0), 0);
+    const catPercent = spent > 0 ? Math.min(100, Math.round((catSpent / spent) * 100)) : 0;
+    return {
+      ...cat,
+      spent: catSpent,
+      count: catDeals.length,
+      percent: catPercent
+    };
+  });
 
   // Policy decision feed items from recent deals
   const recentDecisions = deals.slice(0, 4).map(d => {
@@ -121,14 +147,6 @@ export default function Overview() {
             <span className="w-2 h-2 rounded-full bg-[#15803D]" />
             <span>PayPal Sandbox Active</span>
           </div>
-
-          <Link
-            to="/requests"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[13px] font-semibold transition-colors shadow-xs"
-          >
-            <Plus className="w-4 h-4 stroke-[2.2]" />
-            <span>New Purchase Request</span>
-          </Link>
         </div>
       </div>
 
@@ -301,6 +319,90 @@ export default function Overview() {
           <div className="pt-2 text-[12px] text-[#667085] flex items-center justify-between border-t border-[#E6E8EC]">
             <span>Automatic Approval Threshold: <strong className="text-[#171A21]">${policy?.autoApproveLimit ?? 1000}</strong></span>
             <span>Whitelisted Categories: <strong className="text-[#171A21]">{policy?.allowedServices?.length || 5} active</strong></span>
+          </div>
+
+          {/* Whitelisted Category Breakdown */}
+          <div className="space-y-2 pt-2 border-t border-[#E6E8EC]">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-[#667085] uppercase tracking-wider">
+              <span>Category Spend Distribution</span>
+              <span>Settled Volume</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
+              {categoryMetrics.map(cat => (
+                <div key={cat.key} className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-bold text-[#171A21] truncate">{cat.label}</span>
+                    <span className="text-[10px] text-[#667085]">{cat.count} deal{cat.count === 1 ? '' : 's'}</span>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-[12px] font-bold text-[#171A21] tabular-nums">${cat.spent.toFixed(0)}</span>
+                    <span className="text-[10px] font-semibold text-[#667085]">{cat.percent}%</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#E6E8EC] rounded-full overflow-hidden mt-1.5">
+                    <div
+                      style={{ width: `${Math.max(cat.percent > 0 ? 8 : 0, cat.percent)}%`, backgroundColor: cat.color }}
+                      className="h-full rounded-full"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Deterministic Guardrails Matrix */}
+          <div className="pt-2.5 border-t border-[#E6E8EC] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-[#667085] uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#15803D]" />
+                Active Deterministic Guardrails
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded-md border border-[#BBF7D0]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-pulse" />
+                100% Policy Compliance
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
+              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span className="text-[#344054] font-medium">Replay & Duplicate Shield</span>
+                </div>
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                  Gated (409)
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span className="text-[#344054] font-medium">Server Price Binding</span>
+                </div>
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                  Enforced
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-[#B45309]" />
+                  <span className="text-[#344054] font-medium">Supervisor Auto-Ceiling</span>
+                </div>
+                <span className="text-[11px] font-bold text-[#B45309] bg-[#FFFBEB] px-2 py-0.5 rounded border border-[#FED7AA]">
+                  &gt; ${policy?.autoApproveLimit ?? 1000} Review
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span className="text-[#344054] font-medium">Cryptographic Ledger Sync</span>
+                </div>
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                  SHA-256 Verified
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
