@@ -39,20 +39,31 @@ SpendMesh AI provides 10 core architectural capabilities:
 
 ---
 
-## 5. Live Demo
+## 5. Live Deployments
 
-- **Frontend Application (Vercel):** [https://spendmesh-ai.vercel.app](https://spendmesh-ai.vercel.app) *(Placeholder — update after deployment)*
-- **Backend API (Render):** [https://spendmesh-api.onrender.com](https://spendmesh-api.onrender.com) *(Placeholder — update after deployment)*
+- **Frontend Application (Vercel):** [https://spendmesh-ai.vercel.app](https://spendmesh-ai.vercel.app)
+- **Backend API (Render):** [https://spendmesh-ai-api.onrender.com](https://spendmesh-ai-api.onrender.com)
+- **API Health Check:** [https://spendmesh-ai-api.onrender.com/api/health](https://spendmesh-ai-api.onrender.com/api/health)
 
 ---
 
 ## 6. PayPal Sandbox Demo Credentials
 
-Use these sandbox personal buyer credentials when completing the test payment flow on PayPal's sandbox gateway:
-- **Buyer Email:** `[Add after creating sandbox account]`
-- **Buyer Password:** `[Add after creating sandbox account]`
+When completing the test checkout on PayPal's sandbox gateway, use your PayPal Developer Sandbox Personal Buyer account:
+- **Buyer Test Email:** `sb-buyer@business.example.com` *(or any Sandbox Personal Account from developer.paypal.com)*
+- **Buyer Test Password:** *(From your PayPal Developer Dashboard > Testing Tools > Sandbox Accounts)*
 
-> *Note: These credentials belong exclusively to the PayPal Developer Sandbox environment. No real money or payment method is charged.*
+> *Note: These credentials belong exclusively to the PayPal Developer Sandbox environment. No real money or live payment method is ever charged.*
+
+---
+
+## 6.1 Interactive One-Click Test Scenarios (on `/requests`)
+
+Judges can instantly test the 4 core financial guardrails via the top scenario buttons:
+1. **Standard Purchase ($400):** Gemini extracts scope &rarr; 3 seller bids evaluated &rarr; policy auto-approved &rarr; PayPal Sandbox checkout &rarr; deliverable unlocked & certified receipt generated.
+2. **Price Tampering Detection:** Injects an unauthorized $800 price payload &rarr; SpendMesh detects client tampering, blocks the escalation, and enforces the authentic $400 agreed price.
+3. **Human Escalation ($2,000):** Exceeds the $1,000 auto-approval threshold &rarr; quarantined to the **Approvals** queue &rarr; checkout blocked until executive sign-off.
+4. **Duplicate Replay Blocked:** Replays checkout on a settled transaction &rarr; immediately blocked with HTTP 409 Conflict.
 
 ---
 

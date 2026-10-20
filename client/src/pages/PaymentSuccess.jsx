@@ -268,9 +268,10 @@ export default function PaymentSuccess() {
         </div>
       )}
 
-      {/* Navigation & Receipt Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+      {/* Navigation & Receipt Actions Toolbar */}
+      <div className="bg-[#FFFFFF] border border-[#E6E8EC] p-3.5 sm:p-4 rounded-xl shadow-2xs flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3.5 mt-4">
+        {/* Document Artifacts */}
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => {
               printReceiptDocument({
@@ -284,10 +285,10 @@ export default function PaymentSuccess() {
                 timestamp: new Date()
               });
             }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-[13px] rounded-lg shadow-xs flex items-center justify-center gap-2 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-[13px] rounded-lg shadow-xs transition-all active:scale-95"
           >
-            <Printer className="w-4 h-4" />
-            <span>Print Official Receipt</span>
+            <Printer className="w-4 h-4 stroke-[2.2]" />
+            <span>Print Receipt</span>
           </button>
 
           <button
@@ -313,16 +314,16 @@ export default function PaymentSuccess() {
               }
             }}
             disabled={isDownloadingPdf}
-            className="w-full sm:w-auto px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#1E293B] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] hover:border-[#98A2B3] shadow-2xs transition-all active:scale-95 disabled:opacity-60"
           >
             {isDownloadingPdf ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
-                <span>Downloading...</span>
+                <span>Exporting...</span>
               </>
             ) : (
               <>
-                <Download className="w-4 h-4 text-[#2563EB]" />
+                <Download className="w-4 h-4 text-[#2563EB] stroke-[2.2]" />
                 <span>Download PDF</span>
               </>
             )}
@@ -330,26 +331,27 @@ export default function PaymentSuccess() {
 
           <button
             onClick={() => setShowReceipt(true)}
-            className="w-full sm:w-auto px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] shadow-xs flex items-center justify-center gap-2 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#1E293B] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] hover:border-[#98A2B3] shadow-2xs transition-all active:scale-95"
           >
-            <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
-            <span>View Audit Certificate</span>
+            <ShieldCheck className="w-4 h-4 text-[#16A34A] stroke-[2.2]" />
+            <span>Audit Certificate</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+        {/* Workflow Navigation */}
+        <div className="flex items-center gap-2.5 justify-end pt-3 xl:pt-0 border-t xl:border-t-0 border-[#E6E8EC]">
           <Link
             to="/transactions"
-            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#FFFFFF] border border-[#D0D5DD] text-[#475467] hover:text-[#101828] font-semibold text-[13px] rounded-lg hover:bg-[#F8FAFC] shadow-xs text-center transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#475467] hover:text-[#0F172A] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] hover:border-[#98A2B3] shadow-2xs transition-all"
           >
-            Transactions Ledger
+            <span>Transactions Ledger</span>
           </Link>
           <Link
             to="/requests"
-            className="w-1/2 sm:w-auto px-4 py-2.5 bg-[#101828] hover:bg-black text-white font-semibold text-[13px] rounded-lg shadow-xs flex items-center justify-center gap-1.5 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#101828] hover:bg-black text-white font-semibold text-[13px] rounded-lg shadow-xs transition-all active:scale-95"
           >
             <span>New Request</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 stroke-[2.2]" />
           </Link>
         </div>
       </div>

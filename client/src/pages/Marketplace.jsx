@@ -26,7 +26,8 @@ import {
   FileText,
   Layers,
   Search,
-  Sparkles
+  Sparkles,
+  Copy
 } from 'lucide-react';
 import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -1682,8 +1683,40 @@ export default function Marketplace() {
                 </div>
               </div>
 
-              <div className="p-4 bg-[#EFF4FF] border border-[#BFDBFE] rounded-xl text-[13px] text-[#1E40AF] leading-relaxed">
-                Clicking below initiates a server-to-server call to PayPal Orders v2. You will be redirected to PayPal's sandbox gateway to approve the transaction.
+              {/* PayPal Sandbox Environment & Credentials Card */}
+              <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[13px] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-semibold text-[#1E293B]">
+                    <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
+                    <span>PayPal Sandbox Test Gateway</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-[#475467] bg-[#EDF2F7] px-2.5 py-0.5 rounded-full font-medium">
+                    Orders v2 REST
+                  </span>
+                </div>
+
+                <p className="text-[#64748B] text-[12.5px] leading-relaxed">
+                  Initiates an encrypted server-to-server call to PayPal Orders v2. You will be redirected to PayPal's sandbox gateway to authenticate and approve the transaction.
+                </p>
+
+                <div className="p-3 bg-white border border-[#E2E8F0] rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[12px]">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[#475467] font-semibold">Sandbox Test Buyer:</span>
+                    <code className="text-[#2563EB] font-mono bg-[#EFF6FF] px-2 py-0.5 rounded">sb-buyer@business.example.com</code>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText('sb-buyer@business.example.com');
+                      toast.success('Copied test email to clipboard!');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-[#475467] hover:text-[#0F172A] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded transition-colors self-start sm:self-auto active:scale-95"
+                    title="Copy sandbox test email"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy Email</span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex justify-end pt-2">
