@@ -95,16 +95,19 @@ export function useVoice() {
     lastSpokenRef.current = text;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.08;
-    utterance.pitch = 1.0;
+    utterance.rate = 0.98; // Composed, articulate cadence
+    utterance.pitch = 0.98; // Warmer, authoritative presence
     utterance.volume = 1.0;
     utterance.lang = 'en-US';
 
-    // Prefer a natural female voice if available
+    // Prioritize high-quality natural/neural voices across Edge, Chrome, Safari, Windows, macOS
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find(v =>
       (v.lang === 'en-US' || v.lang === 'en-GB') &&
-      (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen'))
+      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Google') || v.name.includes('Enhanced') || v.name.includes('Premium'))
+    ) || voices.find(v =>
+      (v.lang === 'en-US' || v.lang === 'en-GB') &&
+      (v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('Daniel') || v.name.includes('Guy') || v.name.includes('Aria') || v.name.includes('Zira'))
     ) || voices.find(v => v.lang.startsWith('en'));
     if (preferred) utterance.voice = preferred;
 
