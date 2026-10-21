@@ -22,6 +22,7 @@ import { dealService, policyService, auditService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import DeliverableModal from '../components/DeliverableModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { REGISTERED_AGENTS } from './Agents';
 
 export default function Overview() {
   const [deals, setDeals] = useState([]);
@@ -61,6 +62,11 @@ export default function Overview() {
   const blockedDeals = deals.filter(d => d.status === 'blocked');
   const completedDeals = deals.filter(d => d.status === 'payment_completed');
   const totalActionableApprovals = pendingDeals.length + unpaidAuthorizedDeals.length;
+
+  // Registered Agents metrics from canonical agent directory
+  const totalAgentsCount = REGISTERED_AGENTS.length;
+  const buyerAgentsCount = REGISTERED_AGENTS.filter(a => a.role === 'Buyer Agent').length;
+  const sellerAgentsCount = totalAgentsCount - buyerAgentsCount;
 
   // Category spend metrics from settled deals - Harmonious enterprise palette
   const categoriesList = [
@@ -252,10 +258,10 @@ export default function Overview() {
             </Link>
           </div>
           <span className="text-[28px] font-bold text-[#0F172A] tabular-nums tracking-tight block">
-            4 Active
+            {totalAgentsCount} Active
           </span>
           <p className="text-[12px] text-[#64748B] mt-3 leading-relaxed">
-            1 Buyer agent, 3 specialized seller agents
+            {buyerAgentsCount} Buyer agent, {sellerAgentsCount} specialized seller agents
           </p>
         </div>
       </div>

@@ -2,8 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Bot, CheckCircle, ShieldCheck, ArrowRight, Activity, Zap } from 'lucide-react';
 
-export default function Agents() {
-  const agents = [
+export const REGISTERED_AGENTS = [
     {
       id: 'buyer-core',
       role: 'Buyer Agent',
@@ -112,6 +111,9 @@ export default function Agents() {
       completedDeals: 112
     }
   ];
+
+export default function Agents() {
+  const agents = REGISTERED_AGENTS;
 
   const getCategoryBadge = (cat) => {
     return (
