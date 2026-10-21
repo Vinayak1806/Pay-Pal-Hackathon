@@ -236,26 +236,22 @@ export function processCommand(rawInput, context = {}) {
   // ── 14. Check budget / Treasury balance ─────────────────────────
   if (
     normalized.includes('treasury') ||
-    normalized.includes('treasury balance') ||
-    normalized === 'check treasury balance'
-  ) {
-    return { response: answerScripts.CHECK_TREASURY_BALANCE({ policy }), navigated: false };
-  }
-
-  if (
+    normalized.includes('balance') ||
+    normalized.includes('funds') ||
+    normalized.includes('money') ||
     normalized.includes('budget') ||
     normalized.includes('how much') && (normalized.includes('left') || normalized.includes('remaining') || normalized.includes('available')) ||
     normalized.includes('check my balance')
   ) {
-    return { response: answerScripts.CHECK_BUDGET({ policy }), navigated: false };
+    return { response: answerScripts.CHECK_TREASURY_BALANCE({ policy }), navigated: false };
   }
 
   // ── 14b. Pending Approvals Count ────────────────────────────────
   if (
-    normalized.includes('pending approval') ||
-    normalized.includes('approvals count') ||
-    normalized.includes('how many approval') ||
-    normalized === 'pending approvals count'
+    normalized.includes('pending') ||
+    normalized.includes('approv') ||
+    normalized.includes('queue') ||
+    normalized.includes('how many approval')
   ) {
     return { response: answerScripts.PENDING_APPROVALS_COUNT({ pendingApprovals, approvedDeals }), navigated: false };
   }
@@ -275,7 +271,8 @@ export function processCommand(rawInput, context = {}) {
     normalized.includes('summarize spend') ||
     normalized.includes('today\'s spend') ||
     normalized.includes('todays spend') ||
-    normalized === 'summarize today\'s spend'
+    normalized.includes('spent') ||
+    normalized.includes('spending')
   ) {
     return { response: answerScripts.SUMMARIZE_TODAYS_SPEND({ policy, deals: context.deals }), navigated: false };
   }

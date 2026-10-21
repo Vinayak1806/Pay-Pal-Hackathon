@@ -35,7 +35,7 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
   const title = getPageTitle(location.pathname);
 
   return (
-    <header className="h-14 bg-[#FFFFFF] border-b border-[#E6E8EC] sticky top-0 z-30 flex items-center justify-between px-5 md:px-8">
+    <header className="h-16 bg-[#FFFFFF] border-b border-[#E6E8EC] sticky top-0 z-30 flex items-center justify-between px-5 md:px-8">
       <div className="flex items-center gap-2.5">
         {!sidebarOpen && (
           <>
@@ -59,15 +59,16 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
           <Menu className="w-5 h-5 stroke-[2]" />
         </button>
         <div className="flex items-center gap-2">
-          <h1 className="text-[16px] font-bold text-[#171A21]">{title}</h1>
+          <h1 className="text-[17px] font-bold text-[#171A21] tracking-tight">{title}</h1>
         </div>
       </div>
 
       <div className="flex items-center gap-2.5">
-        {/* PayPal Sandbox Status Indicator */}
-        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D] text-[12px] font-semibold shadow-2xs">
+        {/* Environment Status Indicator */}
+        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[12px] font-medium shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
-          <span>PayPal Sandbox v2</span>
+          <span className="text-[#64748B]">Gateway:</span>
+          <span className="font-semibold text-[#0F172A]">PayPal Orders v2</span>
         </div>
 
         {location.pathname !== '/requests' && location.pathname !== '/marketplace' && (

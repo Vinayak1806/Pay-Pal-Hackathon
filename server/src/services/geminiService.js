@@ -382,25 +382,21 @@ async function answerAssistantQuery(query, context = {}) {
   const committed = Number(policy?.committedAmount) || 0;
   const remaining = Math.max(0, total - spent - committed);
 
-  const prompt = `You are SpendMesh AI Financial Security Guide — an executive autonomous agent spending policy co-pilot built on PayPal Orders v2 Sandbox.
-Your goal is to give a concise (1 to 2 short sentences, under 35 words), authoritative, and helpful answer suitable for text-to-speech.
-Never use markdown asterisks, bolding, bullet points, or emoji in your response. Keep it clear, natural, and direct.
+  const prompt = `You are SpendMesh AI Financial Security Guide.
+Give an ultra-short, crisp 1-sentence answer (maximum 14 words) suitable for speech audio.
+Never use markdown asterisks, bolding, bullet points, or emoji. Be direct and clear.
 
-Current App State:
-- Current Page: ${currentPath || '/'}
-- Total Budget: $${total.toFixed(2)}
-- Available Balance: $${remaining.toFixed(2)}
-- Spent Amount: $${spent.toFixed(2)}
-- Auto-Approve Ceiling: $${policy?.autoApproveLimit || 1000}
-- Allowed Services: ${policy?.allowedServices?.join(', ') || 'presentation, research, website, content, design'}
-${currentDeal ? `- Active Deal: ${currentDeal.serviceType} ($${currentDeal.agreedAmount || currentDeal.price}) with ${currentDeal.sellerAgent}` : ''}
+State:
+- Remaining budget: $${remaining.toFixed(2)}
+- Spent: $${spent.toFixed(2)}
+- Auto-approve limit: $${policy?.autoApproveLimit || 1000}
 
 User Question: "${query}"
 
-Respond concisely in 1-2 spoken sentences:`;
+1-sentence answer:`;
 
   try {
-    const raw = await callGeminiWithTimeout(prompt, 9000);
+    const raw = await callGeminiWithTimeout(prompt, 3500);
     const cleaned = stripHtmlTags(raw).replace(/[*_#`~]/g, '').trim();
     return {
       success: true,
@@ -411,7 +407,7 @@ Respond concisely in 1-2 spoken sentences:`;
     console.warn('Gemini assistant query fallback:', error.message);
     return {
       success: true,
-      response: `Under our PayPal Sandbox policy, you have $${remaining.toFixed(2)} available with an automatic approval limit of $${policy?.autoApproveLimit || 1000}.`,
+      response: `You have $${remaining.toFixed(2)} available with a $${policy?.autoApproveLimit || 1000} approval limit.`,
       source: 'fallback'
     };
   }

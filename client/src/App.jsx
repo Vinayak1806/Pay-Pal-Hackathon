@@ -13,6 +13,7 @@ import AuditLog from './pages/AuditLog';
 import Approvals from './pages/Approvals';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+import Footer from './components/Footer';
 
 // Voice Assistant System
 import { VoiceProvider } from './context/VoiceContext';
@@ -93,16 +94,7 @@ export default function App() {
               </Routes>
             </main>
 
-            <footer className="border-t border-[#E6E8EC] bg-[#FFFFFF] py-4 px-6 text-[12px] text-[#667085] flex flex-col sm:flex-row items-center justify-between gap-2 print:hidden">
-              <div>
-                <span className="font-semibold text-[#171A21]">SpendMesh AI</span>
-                <span className="mx-2 text-[#D0D5DD]">&bull;</span>
-                <span>Autonomous Agent Financial Policy &amp; PayPal Settlement Engine</span>
-              </div>
-              <div className="text-[11px] text-[#8A94A6]">
-                PayPal Orders v2 Sandbox &bull; Google Gemini 2.5 Flash
-              </div>
-            </footer>
+            <Footer />
           </div>
 
           {/* Voice Assistant — globally mounted, outside main layout flow */}

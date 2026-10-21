@@ -202,17 +202,17 @@ export default function VoiceAssistant() {
         const text = res?.response || result.response;
         setMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, text, isThinking: false } : m));
         playAssistantOpenChime();
-        speak(text, { priority: 1 });
+        speak(text, { priority: 1, interruptCurrent: true });
       }).catch(() => {
         setMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, text: result.response, isThinking: false } : m));
-        speak(result.response, { priority: 1 });
+        speak(result.response, { priority: 1, interruptCurrent: true });
       });
       return;
     }
 
     // Normal answer
     addMessage(MSG.ASSISTANT, result.response);
-    speak(result.response, { priority: 1 });
+    speak(result.response, { priority: 1, interruptCurrent: true });
   }, [
     addMessage, clearTranscript, navigate, location.pathname, voiceAppContext,
     stopSpeaking, isMuted, toggleMute, speak, repeatLast, lastSpoken
@@ -365,7 +365,7 @@ export default function VoiceAssistant() {
         }
 
         addMessage(MSG.ASSISTANT, text);
-        speak(text, { priority, interruptCurrent: priority >= 2 });
+        speak(text, { priority, interruptCurrent: true });
         // Never auto-open chat box: strictly user-initiated via floating button
       };
       const unsub = voiceEventBus.on(eventType, handler);

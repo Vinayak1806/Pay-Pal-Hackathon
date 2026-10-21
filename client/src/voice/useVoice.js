@@ -58,19 +58,38 @@ export function useVoice() {
     };
   }, []);
 
-  // ── Pre-load voices on voiceschanged ────────────────────────────
+  // ── Pre-load and cache preferred voice ─────────────────────────
+  const cachedVoiceRef = useRef(null);
+
+  const getBestVoice = useCallback(() => {
+    if (cachedVoiceRef.current) return cachedVoiceRef.current;
+    if (!hasSpeechSynthesis) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+    const preferred = voices.find(v =>
+      (v.lang === 'en-US' || v.lang === 'en-GB') &&
+      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Google') || v.name.includes('Enhanced') || v.name.includes('Premium'))
+    ) || voices.find(v =>
+      (v.lang === 'en-US' || v.lang === 'en-GB') &&
+      (v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('Daniel') || v.name.includes('Guy') || v.name.includes('Aria') || v.name.includes('Zira'))
+    ) || voices.find(v => v.lang.startsWith('en'));
+    cachedVoiceRef.current = preferred || voices[0] || null;
+    return cachedVoiceRef.current;
+  }, [hasSpeechSynthesis]);
+
   useEffect(() => {
     if (hasSpeechSynthesis) {
       window.speechSynthesis.getVoices();
       const onVoicesChanged = () => {
-        window.speechSynthesis.getVoices();
+        cachedVoiceRef.current = null;
+        getBestVoice();
       };
       window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
       return () => {
         window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
       };
     }
-  }, [hasSpeechSynthesis]);
+  }, [hasSpeechSynthesis, getBestVoice]);
 
   // ── Internal: process speak queue ──────────────────────────────
   const _processQueue = useCallback(() => {
@@ -80,12 +99,12 @@ export function useVoice() {
 
     if (!hasSpeechSynthesis) return;
 
-    // Unpause speech engine if paused by browser idle timer
+    // Immediately wake up audio pipeline
     try {
       window.speechSynthesis.resume();
     } catch (e) {}
 
-    // Sort by priority (higher first) then FIFO
+    // Highest priority first
     speakQueueRef.current.sort((a, b) => (b.priority || 0) - (a.priority || 0));
     const { text } = speakQueueRef.current.shift();
 
@@ -95,21 +114,13 @@ export function useVoice() {
     lastSpokenRef.current = text;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.98; // Composed, articulate cadence
-    utterance.pitch = 0.98; // Warmer, authoritative presence
+    utterance.rate = 1.12; // Crisp, responsive, natural assistant rate (15% faster)
+    utterance.pitch = 1.0;
     utterance.volume = 1.0;
     utterance.lang = 'en-US';
 
-    // Prioritize high-quality natural/neural voices across Edge, Chrome, Safari, Windows, macOS
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      (v.lang === 'en-US' || v.lang === 'en-GB') &&
-      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Google') || v.name.includes('Enhanced') || v.name.includes('Premium'))
-    ) || voices.find(v =>
-      (v.lang === 'en-US' || v.lang === 'en-GB') &&
-      (v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('Daniel') || v.name.includes('Guy') || v.name.includes('Aria') || v.name.includes('Zira'))
-    ) || voices.find(v => v.lang.startsWith('en'));
-    if (preferred) utterance.voice = preferred;
+    const preferredVoice = getBestVoice();
+    if (preferredVoice) utterance.voice = preferredVoice;
 
     utterance.onstart = () => {
       setIsSpeaking(true);
@@ -119,20 +130,25 @@ export function useVoice() {
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       utteranceRef.current = null;
-      // Process next in queue
-      setTimeout(_processQueue, 300);
+      // Process next in queue instantly
+      setTimeout(_processQueue, 10);
     };
 
     utterance.onerror = (e) => {
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       utteranceRef.current = null;
-      setTimeout(_processQueue, 300);
+      setTimeout(_processQueue, 10);
     };
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
-  }, [isMuted, hasSpeechSynthesis]);
+
+    // Chrome Windows kickstart: calling resume immediately after speak prevents idle pause
+    try {
+      window.speechSynthesis.resume();
+    } catch (e) {}
+  }, [isMuted, hasSpeechSynthesis, getBestVoice]);
 
   // Re-process queue when mute changes
   useEffect(() => {
@@ -143,7 +159,8 @@ export function useVoice() {
 
   // ── Public: speak ───────────────────────────────────────────────
   /**
-   * Enqueue text for speech synthesis.
+   * Enqueue text for speech synthesis with zero-latency response.
+   * By default, interrupts lingering speech so user gets instant audio.
    * @param {string} text
    * @param {Object} options
    * @param {number} options.priority - 0=normal, 1=important, 2=security alert
@@ -157,18 +174,25 @@ export function useVoice() {
       return;
     }
 
-    const { priority = 0, interruptCurrent = false } = options;
+    const { priority = 0, interruptCurrent = true } = options;
 
-    if (interruptCurrent) {
-      window.speechSynthesis.cancel();
-      isProcessingQueueRef.current = false;
-      setIsSpeaking(false);
-      speakQueueRef.current = [];
-    }
+    // Immediately wake up the speech engine
+    try {
+      window.speechSynthesis.resume();
+    } catch (e) {}
 
-    // Security alerts (priority 2) clear the queue
-    if (priority >= 2) {
-      window.speechSynthesis.cancel();
+    // Interrupt lingering speech immediately so new events or clicks speak without delay
+    if (interruptCurrent !== false) {
+      if (utteranceRef.current) {
+        utteranceRef.current.onstart = null;
+        utteranceRef.current.onend = null;
+        utteranceRef.current.onerror = null;
+        utteranceRef.current = null;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+      } catch (e) {}
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       speakQueueRef.current = [{ text, priority }];

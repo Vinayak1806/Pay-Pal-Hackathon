@@ -74,6 +74,42 @@ export default function Agents() {
       deliveryTime: '24 hours',
       avgPrice: '$300.00',
       completedDeals: 96
+    },
+    {
+      id: 'seller-cloudarchitect',
+      role: 'Enterprise Seller',
+      name: 'CloudWeave Enterprise Architect',
+      purpose: 'Autonomous synthesis of cloud-native microservices, Docker/K8s manifests, and PayPal Orders v2 backend architectures.',
+      categories: ['website'],
+      status: 'Enterprise Verified',
+      capabilities: [
+        'High-concurrency microservice design',
+        'PayPal Orders v2 backend integration schemas',
+        'Containerization & CI/CD deployment manifests',
+        'Automated REST/GraphQL API contracts'
+      ],
+      rating: 5.0,
+      deliveryTime: '48 hours',
+      avgPrice: '$850.00',
+      completedDeals: 74
+    },
+    {
+      id: 'seller-securityauditor',
+      role: 'Enterprise Seller',
+      name: 'SecureMesh Zero-Trust Auditor',
+      purpose: 'Autonomous penetration testing, OWASP API Top 10 evaluation, and cryptographic integrity verification.',
+      categories: ['research'],
+      status: 'Security Certified',
+      capabilities: [
+        'Automated API vulnerability penetration test',
+        'Zero-trust financial spending policy audits',
+        'Cryptographic Merkle tree receipt verification',
+        'PCI-DSS readiness compliance report'
+      ],
+      rating: 4.9,
+      deliveryTime: '24 hours',
+      avgPrice: '$450.00',
+      completedDeals: 112
     }
   ];
 

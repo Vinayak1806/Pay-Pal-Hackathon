@@ -132,9 +132,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
           {/* Understated Environment Badge */}
           <div className="px-4 py-2.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0FDF4] border border-[#BBF7D0] text-[12px] font-semibold text-[#15803D] w-full shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[12px] font-medium text-[#475467] w-full shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
-              <span className="truncate">PayPal Sandbox v2</span>
+              <span className="font-semibold text-[#0F172A] truncate">PayPal Sandbox v2</span>
             </div>
           </div>
 

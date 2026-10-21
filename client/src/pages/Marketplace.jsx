@@ -211,9 +211,12 @@ export default function Marketplace() {
   }, []);
 
   const exampleChips = [
-    'Create a 10-slide presentation for my SIH hackathon pitch, budget $400',
-    'Research the top 5 EdTech competitors, budget $300',
-    'Write landing page copy for my SaaS product, budget $350'
+    'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400',
+    'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850',
+    'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450',
+    'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650',
+    'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300',
+    'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500'
   ];
 
   // Stage 1 -> 2: Find & Parse Services
@@ -263,12 +266,12 @@ export default function Marketplace() {
 
       setStage(2);
 
-      // Emit: parse complete + offers loaded
+      // Emit: parse complete with offers count (single fast narration)
       voiceEventBus.emit(VoiceEvents.PARSE_COMPLETE, {
         serviceType: data.parsedTask?.serviceType,
         budget: data.parsedTask?.maxBudget || data.parsedTask?.budget,
+        count: (data.offers || []).length,
       });
-      voiceEventBus.emit(VoiceEvents.OFFERS_LOADED, { count: (data.offers || []).length });
 
       // Update voice context with stage
       updateVoiceContext({ stage: 2, recommendation: data.recommendation });
@@ -878,11 +881,11 @@ export default function Marketplace() {
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="w-2 h-2 rounded-full bg-[#15803D]" />
                     <span className="text-[13px] font-bold text-[#15803D] group-hover:underline">
-                      1. Standard Purchase
+                      1. Standard Purchase ($400)
                     </span>
                   </div>
                   <p className="text-[12px] text-[#475467] leading-snug">
-                    $400 task &bull; Auto-approved within ceiling &bull; Real PayPal checkout
+                    Auto-cleared by policy &bull; Real PayPal Sandbox checkout &bull; Instant deliverable
                   </p>
                 </button>
 
@@ -893,11 +896,11 @@ export default function Marketplace() {
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="w-2 h-2 rounded-full bg-[#B45309]" />
                     <span className="text-[13px] font-bold text-[#B45309] group-hover:underline">
-                      2. Price Tampering
+                      2. Price Tampering Attack
                     </span>
                   </div>
                   <p className="text-[12px] text-[#475467] leading-snug">
-                    Injects $800 payload &bull; Server ignores it and forces original $400
+                    Simulates $800 payload override &bull; Server detects & forces locked $400
                   </p>
                 </button>
 
@@ -908,11 +911,11 @@ export default function Marketplace() {
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
                     <span className="text-[13px] font-bold text-[#2563EB] group-hover:underline">
-                      3. Human Escalation
+                      3. Human Approval Gate ($2,000)
                     </span>
                   </div>
                   <p className="text-[12px] text-[#475467] leading-snug">
-                    $2,000 task &bull; Exceeds $1,000 threshold &bull; Quarantined to queue
+                    Exceeds $1,000 auto-ceiling &bull; Quarantined to Approvals queue for review
                   </p>
                 </button>
 
@@ -923,11 +926,11 @@ export default function Marketplace() {
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="w-2 h-2 rounded-full bg-[#B42318]" />
                     <span className="text-[13px] font-bold text-[#B42318] group-hover:underline">
-                      4. Duplicate Blocked
+                      4. Duplicate Replay Attack
                     </span>
                   </div>
                   <p className="text-[12px] text-[#475467] leading-snug">
-                    Replays checkout on settled deal &bull; Returns HTTP 409 Conflict
+                    Replays payment on settled deal &bull; Blocked with HTTP 409 Conflict
                   </p>
                 </button>
               </div>
@@ -1096,9 +1099,10 @@ export default function Marketplace() {
                 <button
                   onClick={() => handleFindServices()}
                   disabled={!taskInput.trim()}
-                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-[14px] rounded-lg shadow-xs transition-colors flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-[14px] rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Analyze & Solicit Bids</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Submit Request & Solicit Agent Bids</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1227,13 +1231,13 @@ export default function Marketplace() {
                         className="px-4 py-2 text-[13px] font-semibold text-[#344054] hover:bg-[#F8FAFC] border border-[#D0D5DD] rounded-lg transition-colors flex items-center gap-1.5"
                       >
                         <Edit3 className="w-4 h-4" />
-                        <span>Modify Requirements</span>
+                        <span>Edit Scope Checklist</span>
                       </button>
                       <button
                         onClick={() => setStage(3)}
-                        className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
                       >
-                        <span>View Competing Bids ({offers.length})</span>
+                        <span>Compare Competing Agent Bids ({offers.length})</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -1477,13 +1481,14 @@ export default function Marketplace() {
 
                       <button
                         onClick={() => handleSelectOffer(offer)}
-                        className={`w-full py-2.5 rounded-lg text-[13px] font-semibold transition-colors shadow-xs ${
+                        className={`w-full py-2.5 rounded-lg text-[13px] font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 ${
                           isRecommended
                             ? 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
                             : 'bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#101828] border border-[#D0D5DD]'
                         }`}
                       >
-                        Select Offer
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Select Offer & Check Policy</span>
                       </button>
                     </div>
                   );
@@ -1619,9 +1624,10 @@ export default function Marketplace() {
                   </div>
                   <button
                     onClick={() => setStage(5)}
-                    className="px-6 py-2.5 bg-[#15803D] hover:bg-[#166534] text-white text-[13px] font-semibold rounded-lg whitespace-nowrap shadow-xs transition-colors"
+                    className="px-6 py-2.5 bg-[#15803D] hover:bg-[#166534] text-white text-[13px] font-semibold rounded-lg whitespace-nowrap shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
                   >
-                    Proceed to Checkout &rarr;
+                    <CreditCard className="w-4 h-4" />
+                    <span>Authorize PayPal Sandbox Checkout &rarr;</span>
                   </button>
                 </div>
               ) : (
@@ -1658,7 +1664,7 @@ export default function Marketplace() {
                   onClick={() => setStage(4)}
                   className="text-[13px] font-semibold text-[#475467] hover:text-[#101828] transition-colors"
                 >
-                  &larr; Back to policy
+                  &larr; Back to Policy Evaluation
                 </button>
               </div>
 
@@ -1722,10 +1728,11 @@ export default function Marketplace() {
               <div className="flex justify-end pt-2">
                 <button
                   onClick={handleCheckout}
-                  className="px-7 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2.5"
+                  className="px-7 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2.5 cursor-pointer"
                 >
                   <CreditCard className="w-4 h-4" />
-                  <span>Pay with PayPal Sandbox</span>
+                  <span>Pay with PayPal Sandbox (${currentDeal.agreedAmount?.toFixed(2)})</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>

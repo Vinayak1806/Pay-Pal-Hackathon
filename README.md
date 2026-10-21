@@ -1,45 +1,73 @@
 # SpendMesh AI
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-26%20passed%20%7C%204%20suites-success.svg)](#testing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-blue.svg)](https://nodejs.org)
 [![PayPal Orders v2](https://img.shields.io/badge/PayPal-Orders_v2_Sandbox-0070BA.svg)](https://developer.paypal.com)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-1.5_Flash-8E75C2.svg)](https://aistudio.google.com)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-8E75C2.svg)](https://aistudio.google.com)
 
 ---
 
 ## 2. Tagline
-> **The financial trust layer that stops autonomous AI agents from overspending your budget.**
+> **The deterministic financial trust layer that stops autonomous AI agents from overspending your budget.**
 
 ---
 
 ## 3. Problem Statement
 
-As autonomous AI agents evolve from conversational assistants into economic actors capable of procuring services, APIs, computing resources, and contracting freelancers, we encounter a fundamental security vulnerability: **How can humans safely delegate purchasing power to autonomous agents without granting them unconstrained access to financial instruments?**
+As autonomous AI agents evolve from conversational bots into economic actors capable of procuring services, computing resources, and contracting vendors, a fundamental security challenge arises: **How can enterprises safely delegate purchasing power to autonomous agents without granting them unconstrained access to financial instruments?**
 
-Giving an AI agent direct credit card credentials or unchecked checkout authority creates immense exposure. Hallucinations, rogue loop conditions, prompt injection exploits, or seller price gouging can rapidly deplete corporate treasury pools or personal bank balances within milliseconds.
+Giving an AI agent direct credit card credentials or unchecked checkout authority creates catastrophic exposure:
+- **Non-deterministic hallucinations** can lead to unauthorized high-value purchases.
+- **Prompt injection attacks** can manipulate price parameters during execution.
+- **Rogue loop conditions** can drain an entire company treasury within seconds.
 
-SpendMesh AI solves this by introducing a strict, zero-trust financial perimeter between autonomous agent negotiations and payment gateways like PayPal. No agent can bypass deterministic spending policies, tamper with negotiated amounts, or exceed cumulative budget thresholds.
-
----
-
-## 4. Solution & Capabilities
-
-SpendMesh AI provides 10 core architectural capabilities:
-1. **Natural Language Requirement Parsing:** Google Gemini 1.5 decomposes user goals into structured service schemas and budget ceilings.
-2. **Autonomous Multi-Agent Economy:** Buyer agents solicit and rank competitive proposals from specialized seller agents.
-3. **Deterministic Policy Enforcement:** Inflexible server-side rules validate allowable categories, amounts, and budgets prior to payment initiation.
-4. **Server-Side Price Binding:** Never trusts browser- or agent-supplied amounts; orders are generated solely using cryptographic server deal records.
-5. **Race-Free Budget Reservoirs:** Atomic MongoDB `$inc` operations with `$expr` balance validation prevent concurrent overspending exploits.
-6. **Active Tamper Detection:** Intercepts and logs malicious price overrides, shielding the buyer's balance while executing the genuine agreed deal.
-7. **Human-in-the-Loop Escalation:** Quarantines transactions exceeding the autonomous threshold into a dedicated Approval Center.
-8. **Native PayPal Orders v2 Sandbox Integration:** Server-to-server order generation and server-side capture verification.
-9. **Payment-Gated Deliverable Delivery:** Work artifacts (presentations, research dossiers, code) remain strictly locked until confirmed settlement.
-10. **Enterprise Financial Observability:** AG Grid data tables paired with an immutable audit log track every agent deliberation and dollar spent.
+**SpendMesh AI** bridges this critical gap by introducing a strict, zero-trust financial policy perimeter between autonomous agent negotiations and payment gateways like PayPal. No agent can bypass deterministic spending policies, tamper with agreed amounts, or exceed cumulative budget thresholds.
 
 ---
 
-## 5. Live Deployments
+## 4. System Architecture
+
+```mermaid
+flowchart TD
+    User([User Prompt / Voice Assistant]) -->|Natural Language| BuyerAgent[SpendMesh Buyer Agent]
+    BuyerAgent -->|Gemini 2.5 Flash| ScopeExtractor[Scope & Constraint Parser]
+    
+    subgraph MultiAgent [Autonomous Multi-Agent Economy]
+        ScopeExtractor --> Seller1[SlideCraft AI]
+        ScopeExtractor --> Seller2[CloudWeave Architect]
+        ScopeExtractor --> Seller3[SecureMesh Auditor]
+        Seller1 --> Bids[Competing Agent Bids]
+        Seller2 --> Bids
+        Seller3 --> Bids
+    end
+    
+    Bids -->|Gemini Recommendation| PolicyEngine{SpendMesh Deterministic Policy Engine}
+    
+    subgraph PolicyGates [5 Deterministic Security Gates]
+        PolicyEngine --> Gate1[1. Server-Side Price Binding]
+        PolicyEngine --> Gate2[2. Vendor & Category Whitelist]
+        PolicyEngine --> Gate3[3. Treasury Budget Capacity]
+        PolicyEngine --> Gate4[4. Replay & Duplicate Gate]
+        PolicyEngine --> Gate5[5. Auto-Approval Ceiling - $1,000]
+    end
+    
+    Gate5 -->|Amount > $1,000| ApprovalsQueue[Human-in-the-Loop Approvals Queue]
+    ApprovalsQueue -->|Supervisor Authorizes| PayPalGate[PayPal Orders v2 REST API]
+    Gate5 -->|Amount <= $1,000| PayPalGate
+    
+    PayPalGate -->|Server-Stored Amount Only| SandboxModal[PayPal Sandbox Gateway]
+    SandboxModal -->|Buyer Approves| CaptureAPI[Server-Side Order Capture]
+    
+    CaptureAPI --> MerkleLedger[(Immutable SHA-256 Merkle Ledger)]
+    CaptureAPI --> DeliverableGen[Gemini Deliverable Synthesis]
+    CaptureAPI --> ReceiptExport[Certified PDF & Compliance Certificate]
+```
+
+---
+
+## 5. Live Production Deployments
 
 - **Frontend Application (Vercel):** [https://spendmesh-ai.vercel.app](https://spendmesh-ai.vercel.app)
 - **Backend API (Render):** [https://spendmesh-ai-api.onrender.com](https://spendmesh-ai-api.onrender.com)
@@ -60,105 +88,28 @@ When completing the test checkout on PayPal's sandbox gateway, use your PayPal D
 ## 6.1 Interactive One-Click Test Scenarios (on `/requests`)
 
 Judges can instantly test the 4 core financial guardrails via the top scenario buttons:
-1. **Standard Purchase ($400):** Gemini extracts scope &rarr; 3 seller bids evaluated &rarr; policy auto-approved &rarr; PayPal Sandbox checkout &rarr; deliverable unlocked & certified receipt generated.
-2. **Price Tampering Detection:** Injects an unauthorized $800 price payload &rarr; SpendMesh detects client tampering, blocks the escalation, and enforces the authentic $400 agreed price.
-3. **Human Escalation ($2,000):** Exceeds the $1,000 auto-approval threshold &rarr; quarantined to the **Approvals** queue &rarr; checkout blocked until executive sign-off.
-4. **Duplicate Replay Blocked:** Replays checkout on a settled transaction &rarr; immediately blocked with HTTP 409 Conflict.
+1. **1. Standard Purchase ($400):** Gemini extracts scope &rarr; 3 seller bids evaluated &rarr; policy auto-approved &rarr; PayPal Sandbox checkout &rarr; deliverable unlocked & certified receipt generated.
+2. **2. Price Tampering Attack:** Injects an unauthorized $800 price payload &rarr; SpendMesh detects client tampering, blocks the escalation, and enforces the authentic $400 agreed price.
+3. **3. Human Approval Gate ($2,000):** Exceeds the $1,000 auto-approval threshold &rarr; quarantined to the **Approvals** queue &rarr; checkout blocked until executive sign-off.
+4. **4. Duplicate Replay Attack:** Replays checkout on a settled transaction &rarr; immediately blocked with HTTP 409 Conflict.
 
 ---
 
 ## 7. Technology Stack
 
-| Layer | Technologies |
-|---|---|
-| **Frontend** | React 18, Vite, Tailwind CSS, AG Grid Community, Lucide React, Axios, React Hot Toast |
-| **Backend** | Node.js (v20+), Express.js, Helmet, CORS, Express Rate Limit |
-| **Database** | MongoDB Atlas, Mongoose (Atomic operators `$inc`, `$expr`) |
-| **AI / LLM** | Google Gemini 1.5 Flash (`@google/generative-ai`) with deterministic fallbacks |
-| **Payments** | PayPal REST API (Orders v2 Sandbox) with server-side OAuth2 token caching |
-| **Testing** | Jest, Supertest |
+| Layer | Technologies | Purpose |
+|---|---|---|
+| **Frontend** | React 18, Vite 5, Tailwind CSS | High-performance responsive executive dashboard |
+| **Backend** | Node.js (v20+), Express 5, Helmet, CORS | Zero-trust API gateway with rate limiting |
+| **Database** | MongoDB Atlas, Mongoose | Atomic operations (`$inc`, `$expr`) for race-free balance reservation |
+| **AI / LLM** | Google Gemini 2.5 Flash (`@google/generative-ai`) | Structured requirement parsing, bid ranking, deliverable synthesis |
+| **Payments** | PayPal REST API (Orders v2 Sandbox) | Native server-to-server OAuth2 order creation & verified capture |
+| **Voice Engine** | Web Speech API, Web Audio Synthesizer | Natural neural voice guidance, audio equalizers, and acoustic chimes |
+| **Testing** | Jest, Supertest | 26 unit & integration tests covering policy, payments, and agents |
 
 ---
 
-## 8. Project Structure
-
-```
-spendmesh-ai/
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── BudgetMeter.jsx
-│   │   │   ├── DealCard.jsx
-│   │   │   ├── StatusBadge.jsx
-│   │   │   ├── ApprovalModal.jsx
-│   │   │   ├── DeliverableModal.jsx
-│   │   │   └── LoadingSpinner.jsx
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Marketplace.jsx
-│   │   │   ├── Approvals.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── AuditLog.jsx
-│   │   │   ├── PaymentSuccess.jsx
-│   │   │   └── PaymentCancel.jsx
-│   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── .env.example
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── postcss.config.js
-├── server/
-│   ├── src/
-│   │   ├── agents/
-│   │   │   ├── buyerAgent.js
-│   │   │   └── sellerAgents.js
-│   │   ├── controllers/
-│   │   │   ├── agentController.js
-│   │   │   ├── dealController.js
-│   │   │   ├── paymentController.js
-│   │   │   ├── policyController.js
-│   │   │   └── auditController.js
-│   │   ├── models/
-│   │   │   ├── Deal.js
-│   │   │   ├── Policy.js
-│   │   │   ├── Payment.js
-│   │   │   └── AuditLog.js
-│   │   ├── routes/
-│   │   │   ├── agentRoutes.js
-│   │   │   ├── dealRoutes.js
-│   │   │   ├── paymentRoutes.js
-│   │   │   ├── policyRoutes.js
-│   │   │   └── auditRoutes.js
-│   │   ├── services/
-│   │   │   ├── policyEngine.js
-│   │   │   ├── paypalService.js
-│   │   │   └── geminiService.js
-│   │   ├── middleware/
-│   │   │   └── errorHandler.js
-│   │   └── app.js
-│   ├── tests/
-│   │   ├── policy.test.js
-│   │   ├── agents.test.js
-│   │   ├── payments.test.js
-│   │   └── deals.test.js
-│   ├── .env.example
-│   └── package.json
-├── DEVPOST_SUBMISSION.md
-├── README.md
-├── LICENSE
-├── .gitignore
-└── package.json
-```
-
----
-
-## 9. Local Setup Instructions
+## 8. Local Setup Instructions
 
 ### Prerequisites
 - Node.js version 20.0.0 or higher
@@ -171,8 +122,8 @@ spendmesh-ai/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/vinayakpawate/spendmesh-ai.git
-   cd spendmesh-ai
+   git clone https://github.com/Vinayak1806/Pay-Pal-Hackathon.git
+   cd Pay-Pal-Hackathon
    ```
 
 2. **Install all dependencies:**
@@ -194,7 +145,7 @@ spendmesh-ai/
    PAYPAL_CLIENT_SECRET=your_paypal_sandbox_client_secret
    PAYPAL_BASE_URL=https://api-m.sandbox.paypal.com
    GEMINI_API_KEY=your_gemini_api_key
-   GEMINI_MODEL=gemini-1.5-flash
+   GEMINI_MODEL=gemini-2.5-flash
    CLIENT_URL=http://localhost:5173
    ```
 

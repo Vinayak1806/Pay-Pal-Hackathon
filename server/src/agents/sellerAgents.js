@@ -13,29 +13,29 @@ const sellerNames = {
 
 const descriptions = {
   presentation: [
-    'Professional slide deck with custom graphics, animations, and speaker notes. Includes 2 revision rounds.',
-    'Premium presentation design with data visualization, infographics, and polished transitions. 3 revision rounds.',
-    'Executive-level presentation with custom illustrations, brand alignment, and comprehensive speaker guide. Unlimited revisions.'
+    '10-slide structured presentation with clear problem-solution narrative, custom graphics, and speaker delivery notes. Includes 2 revision rounds.',
+    'Executive Series A/B Investment Pitch Deck with institutional market traction slides, unit economics modeling, and 3D visual assets. 3 revision rounds.',
+    'Enterprise Corporate Strategy Keynote: Complete brand design system, interactive financial projections, and high-resolution vector exports. Unlimited revisions.'
   ],
   research: [
-    'Comprehensive market research with data analysis, trend identification, and actionable insights. 5-page report.',
-    'In-depth competitor analysis with SWOT framework, market sizing, and strategic recommendations. 10-page report.',
-    'Full-spectrum research brief with primary data collection, expert interviews, and detailed methodology. 15-page report.'
+    'Comprehensive market analysis with primary data modeling, competitor matrix, trend identification, and actionable roadmap. 10-page dossier.',
+    'Deep-dive competitor intelligence dossier: SWOT benchmarking, feature parity analysis, and TAM/SAM/SOM financial valuation models. 15-page dossier.',
+    'Zero-Trust Security & PCI-DSS Compliance Audit: Automated penetration testing, OWASP Top 10 API vulnerability assessment, and cryptographic audit report.'
   ],
   website: [
-    'Responsive landing page with SEO optimization, contact form, and analytics integration. Mobile-first design.',
-    'Multi-page website with custom CMS, blog integration, and performance optimization. Includes 3 pages.',
-    'Full-featured web application with user authentication, dashboard, and API integration. Includes 5 pages.'
+    'Full-Stack SaaS MVP with responsive Tailwind UI, Node.js backend, authenticated dashboard, and PayPal/Stripe checkout. Includes unit tests & deployment guide.',
+    'Enterprise FinTech Web Application featuring high-concurrency microservices, PayPal Orders v2 escrow checkout, Redis caching, and real-time WebSockets.',
+    'Cloud-Native Production Architecture: Multi-tenant SaaS with Docker/Kubernetes manifests, automated CI/CD pipeline, and 99.99% SLA benchmark.'
   ],
   content: [
-    'SEO-optimized content package including blog posts, social media copy, and email templates. 5 pieces.',
-    'Comprehensive content strategy with editorial calendar, brand voice guide, and 10 content pieces.',
-    'Full content ecosystem including video scripts, podcast outlines, social campaigns, and 15 written pieces.'
+    'Comprehensive enterprise content strategy with technical whitepapers, developer documentation, and SEO keyword integration. 5 key deliverables.',
+    'Full-funnel B2B content ecosystem: Interactive case studies, product documentation, landing page copy, and automated email onboarding sequences.',
+    'Multi-channel investor & enterprise communication suite: Press releases, thought leadership articles, and executive briefing dossiers.'
   ],
   design: [
-    'Brand identity package with logo, color palette, typography guide, and basic stationery design.',
-    'Complete visual design system with UI components, iconography, and detailed brand guidelines.',
-    'Premium design package with full brand identity, marketing collateral, social media templates, and style guide.'
+    'Complete design system with Figma component tokens, accessible WCAG 2.1 contrast guidelines, and responsive desktop/mobile UI library.',
+    'Enterprise brand identity: High-fidelity vector logos, design tokens, multi-platform style guide, and developer handoff specs.',
+    'Full product UX/UI overhaul: Interactive prototype, micro-interaction states, design tokens export, and user testing synthesis.'
   ]
 };
 
