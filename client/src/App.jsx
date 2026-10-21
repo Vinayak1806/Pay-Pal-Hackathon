@@ -42,17 +42,17 @@ export default function App() {
     <Router>
       <VoiceProvider>
         <RouteWatcher />
-        <div className="min-h-screen bg-[#F7F8FA] text-[#171A21] flex">
+        <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex">
           <Toaster
             position="top-right"
             toastOptions={{
               duration: 4000,
               style: {
                 background: '#FFFFFF',
-                color: '#171A21',
+                color: '#0F172A',
                 fontSize: '13px',
                 borderRadius: '8px',
-                border: '1px solid #E6E8EC',
+                border: '1px solid #E2E8F0',
                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)'
               }
             }}

@@ -66,7 +66,7 @@ export default function DeliverableModal({ deal, isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 print:static print:inset-auto print:block print:p-0 print:bg-white print:overflow-visible">
-      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-2xl w-full max-h-[88vh] flex flex-col border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto print:shadow-none print:border print:border-[#E2E8F0] print:max-h-none print:block print:w-full print:max-w-none print:my-0">
+      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-2xl w-full max-h-[88vh] flex flex-col border border-[#E2E8F0] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto print:shadow-none print:border print:border-[#E2E8F0] print:max-h-none print:block print:w-full print:max-w-none print:my-0">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] shrink-0 bg-white">
           <div className="flex items-center gap-3">

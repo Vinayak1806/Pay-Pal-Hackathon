@@ -23,10 +23,10 @@
 /* Refined AG Grid styling to blend seamlessly into SaaS layout */
 .ag-theme-alpine {
   --ag-background-color: #FFFFFF;
-  --ag-header-background-color: #F7F8FA;
-  --ag-header-foreground-color: #667085;
-  --ag-border-color: #E6E8EC;
-  --ag-row-border-color: #E6E8EC;
+  --ag-header-background-color: #F8FAFC;
+  --ag-header-foreground-color: #475467;
+  --ag-border-color: #E2E8F0;
+  --ag-row-border-color: #E2E8F0;
   --ag-font-size: 13px;
   --ag-font-family: inherit;
   --ag-selected-row-background-color: #EFF4FF;

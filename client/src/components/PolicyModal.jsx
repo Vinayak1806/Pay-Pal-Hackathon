@@ -69,43 +69,43 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
 
   return (
     <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6">
-      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-lg w-full max-h-[88vh] flex flex-col border border-[#E6E8EC] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+      <div className="bg-[#FFFFFF] rounded-xl shadow-2xl max-w-lg w-full max-h-[88vh] flex flex-col border border-[#E2E8F0] overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E8EC] shrink-0 bg-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] shrink-0 bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center border border-[#BFDBFE]">
               <Sliders className="w-4 h-4 stroke-[2]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-semibold text-[#171A21]">
+              <h3 className="text-[16px] font-bold text-[#0F172A]">
                 Spending Policy Configurator
               </h3>
-              <p className="text-[12px] text-[#667085]">
+              <p className="text-[12px] text-[#475467]">
                 Tune deterministic spending rules enforced on all AI agents
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-[#667085] hover:text-[#171A21] hover:bg-[#F7F8FA] rounded-md transition-colors"
+            className="p-1.5 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] rounded-md transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-5 text-[13px] text-[#171A21] overflow-y-auto flex-1">
+        <div className="p-6 space-y-5 text-[13px] text-[#0F172A] overflow-y-auto flex-1">
           {/* Rule 1: Auto-Approve Limit */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="font-medium text-[#171A21]">
+              <label className="font-semibold text-[#0F172A]">
                 Auto-Approval Ceiling Threshold
               </label>
               <span className="font-semibold text-[13px] text-[#2563EB] bg-[#EFF4FF] px-2 py-0.5 rounded border border-[#BFDBFE] tabular-nums">
                 ${autoApproveLimit} USD
               </span>
             </div>
-            <p className="text-[12px] text-[#667085] leading-relaxed">
+            <p className="text-[12px] text-[#475467] leading-relaxed">
               Purchases exceeding this amount are automatically frozen and escalated for manual approval.
             </p>
             <input
@@ -115,9 +115,9 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
               step="50"
               value={autoApproveLimit}
               onChange={(e) => setAutoApproveLimit(Number(e.target.value))}
-              className="w-full h-1.5 bg-[#E6E8EC] rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
+              className="w-full h-1.5 bg-[#E2E8F0] rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
             />
-            <div className="flex justify-between text-[11px] text-[#667085]">
+            <div className="flex justify-between text-[11px] text-[#64748B]">
               <span>$100 (Strict)</span>
               <span>$1,000 (Default)</span>
               <span>$3,000 (Permissive)</span>
@@ -125,12 +125,12 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
           </div>
 
           {/* Rule 2: Total Budget Pool */}
-          <div className="space-y-1.5 pt-3 border-t border-[#E6E8EC]">
+          <div className="space-y-1.5 pt-3 border-t border-[#E2E8F0]">
             <div className="flex items-center justify-between">
-              <label className="font-medium text-[#171A21]">
+              <label className="font-semibold text-[#0F172A]">
                 Total Allocated Treasury Budget
               </label>
-              <span className="font-semibold text-[#171A21] tabular-nums text-[13px]">
+              <span className="font-semibold text-[#0F172A] tabular-nums text-[13px]">
                 ${totalBudget} USD
               </span>
             </div>
@@ -141,16 +141,16 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
               step="100"
               value={totalBudget}
               onChange={(e) => setTotalBudget(Number(e.target.value))}
-              className="w-full rounded-lg border border-[#E6E8EC] px-3 py-2 text-[13px] text-[#171A21] bg-[#FFFFFF] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full rounded-lg border border-[#E2E8F0] px-3 py-2 text-[13px] text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
             />
           </div>
 
           {/* Rule 3: Allowed Categories Whitelist */}
-          <div className="space-y-2 pt-3 border-t border-[#E6E8EC]">
-            <label className="font-medium text-[#171A21] block">
+          <div className="space-y-2 pt-3 border-t border-[#E2E8F0]">
+            <label className="font-semibold text-[#0F172A] block">
               Permitted Service Categories (Whitelist)
             </label>
-            <p className="text-[12px] text-[#667085]">
+            <p className="text-[12px] text-[#475467]">
               Unchecked categories will be instantly blocked by the policy engine.
             </p>
             <div className="grid grid-cols-1 gap-1.5">
@@ -164,8 +164,8 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
                     onClick={() => toggleService(svc.id)}
                     className={`flex items-center justify-between px-3 py-2 rounded-lg border text-left transition-colors text-[13px] ${
                       isSelected
-                        ? 'bg-[#EFF4FF] border-[#BFDBFE] text-[#2563EB] font-medium'
-                        : 'bg-[#FFFFFF] border-[#E6E8EC] text-[#667085] hover:bg-[#F7F8FA]'
+                        ? 'bg-[#EFF4FF] border-[#2563EB] text-[#2563EB] font-medium shadow-2xs'
+                        : 'bg-[#FFFFFF] border-[#E2E8F0] text-[#475467] hover:bg-[#F8FAFC]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -189,11 +189,11 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E6E8EC] flex items-center justify-between shrink-0">
+        <div className="px-6 py-3 bg-[#FAFAFC] border-t border-[#E2E8F0] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-2.5 py-1.5 text-[#667085] hover:text-[#171A21] text-[12px] font-medium flex items-center gap-1.5 transition-colors"
+            className="px-2.5 py-1.5 text-[#475467] hover:text-[#0F172A] text-[12px] font-medium flex items-center gap-1.5 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Defaults</span>
@@ -202,7 +202,7 @@ export default function PolicyModal({ isOpen, onClose, policy, onPolicyUpdated }
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 text-[#667085] hover:text-[#171A21] text-[12px] font-medium rounded-lg"
+              className="px-3 py-1.5 text-[#475467] hover:text-[#0F172A] text-[12px] font-medium rounded-lg"
             >
               Cancel
             </button>

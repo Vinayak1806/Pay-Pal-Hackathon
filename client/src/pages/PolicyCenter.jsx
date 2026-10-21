@@ -65,46 +65,31 @@ export default function PolicyCenter() {
       id: 'presentation',
       name: 'Presentation & Pitch Decks',
       desc: 'AI-generated investor slide decks, visual outlines, and speaking notes.',
-      icon: BarChart3,
-      tagBg: 'bg-[#EFF4FF]',
-      tagText: 'text-[#2563EB]',
-      borderActive: 'border-[#BFDBFE]'
+      icon: BarChart3
     },
     {
       id: 'research',
       name: 'Competitor & Market Research',
       desc: 'Automated competitive intelligence, sector market maps, and SWOT briefs.',
-      icon: Search,
-      tagBg: 'bg-[#ECFEFF]',
-      tagText: 'text-[#0891B2]',
-      borderActive: 'border-[#A5F3FC]'
+      icon: Search
     },
     {
       id: 'website',
       name: 'Web & Landing Page Development',
       desc: 'Responsive web copy, landing pages, and frontend component specs.',
-      icon: Globe,
-      tagBg: 'bg-[#F5F3FF]',
-      tagText: 'text-[#7C3AED]',
-      borderActive: 'border-[#DDD6FE]'
+      icon: Globe
     },
     {
       id: 'content',
       name: 'Copywriting & Content Strategy',
       desc: 'High-conversion blog posts, marketing email copy, and SEO articles.',
-      icon: FileEdit,
-      tagBg: 'bg-[#F0FDF4]',
-      tagText: 'text-[#15803D]',
-      borderActive: 'border-[#BBF7D0]'
+      icon: FileEdit
     },
     {
       id: 'design',
       name: 'UI/UX & Brand Design',
       desc: 'Brand visual identity systems, color palettes, typography, and iconography.',
-      icon: Palette,
-      tagBg: 'bg-[#FFFBEB]',
-      tagText: 'text-[#B45309]',
-      borderActive: 'border-[#FED7AA]'
+      icon: Palette
     }
   ];
 
@@ -174,10 +159,10 @@ export default function PolicyCenter() {
   return (
     <div className="space-y-6 w-full">
       {/* Page Header with Readable Typography */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#E6E8EC]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0]">
         <div>
-          <h2 className="text-[26px] font-bold text-[#171A21] tracking-tight">Policy Center</h2>
-          <p className="text-[14px] text-[#667085] mt-1">
+          <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight">Policy Center</h2>
+          <p className="text-[14px] text-[#475467] mt-1">
             Configure deterministic spending parameters, approval ceilings, and category controls for all AI agents.
           </p>
         </div>
@@ -190,12 +175,12 @@ export default function PolicyCenter() {
         )}
       </div>
 
-      {/* Live Treasury Reservoir Status with Clear Logical Colors */}
-      <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E6E8EC] shadow-xs space-y-4">
+      {/* Live Treasury Reservoir Status - Harmonized White Cards */}
+      <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-[#2563EB]" />
-            <h3 className="text-[13px] font-bold text-[#171A21] uppercase tracking-wider">
+            <h3 className="text-[13px] font-bold text-[#0F172A] uppercase tracking-wider">
               Live Treasury Reservoir Status
             </h3>
           </div>
@@ -206,44 +191,44 @@ export default function PolicyCenter() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-          {/* Settled Spend - Logical Emerald/Green */}
-          <div className="p-4 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] transition-all">
-            <div className="flex items-center justify-between text-[#15803D] mb-1">
-              <span className="text-[13px] font-semibold">Settled Spend</span>
-              <CheckCircle2 className="w-4 h-4" />
+          {/* Settled Spend */}
+          <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs transition-all hover:border-[#CBD5E1]">
+            <div className="flex items-center justify-between text-[#475467] mb-1">
+              <span className="text-[13px] font-semibold text-[#0F172A]">Settled Spend</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#15803D]" />
             </div>
-            <span className="text-[26px] font-bold text-[#15803D] tabular-nums block">
+            <span className="text-[26px] font-bold text-[#0F172A] tabular-nums block">
               ${spent.toFixed(2)}
             </span>
-            <span className="text-[12px] text-[#166534] font-medium block mt-1">
+            <span className="text-[12px] text-[#64748B] font-medium block mt-1">
               PayPal Orders v2 Settled
             </span>
           </div>
 
-          {/* Committed in Escrow - Logical Amber */}
-          <div className="p-4 rounded-xl bg-[#FFFBEB] border border-[#FED7AA] transition-all">
-            <div className="flex items-center justify-between text-[#B45309] mb-1">
-              <span className="text-[13px] font-semibold">Committed in Escrow</span>
-              <Clock className="w-4 h-4" />
+          {/* Committed in Escrow */}
+          <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs transition-all hover:border-[#CBD5E1]">
+            <div className="flex items-center justify-between text-[#475467] mb-1">
+              <span className="text-[13px] font-semibold text-[#0F172A]">Committed in Escrow</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
             </div>
-            <span className="text-[26px] font-bold text-[#B45309] tabular-nums block">
+            <span className="text-[26px] font-bold text-[#0F172A] tabular-nums block">
               ${committed.toFixed(2)}
             </span>
-            <span className="text-[12px] text-[#92400E] font-medium block mt-1">
+            <span className="text-[12px] text-[#64748B] font-medium block mt-1">
               Reserved for Active Checkouts
             </span>
           </div>
 
-          {/* Remaining Available - Logical Brand Blue */}
-          <div className="p-4 rounded-xl bg-[#EFF4FF] border border-[#BFDBFE] transition-all">
-            <div className="flex items-center justify-between text-[#2563EB] mb-1">
-              <span className="text-[13px] font-semibold">Remaining Available</span>
-              <ShieldCheck className="w-4 h-4" />
+          {/* Remaining Available */}
+          <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-xs transition-all hover:border-[#CBD5E1]">
+            <div className="flex items-center justify-between text-[#475467] mb-1">
+              <span className="text-[13px] font-semibold text-[#0F172A]">Remaining Available</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
             </div>
             <span className="text-[26px] font-bold text-[#2563EB] tabular-nums block">
               ${remaining.toFixed(2)}
             </span>
-            <span className="text-[12px] text-[#1D4ED8] font-medium block mt-1">
+            <span className="text-[12px] text-[#64748B] font-medium block mt-1">
               of ${total.toFixed(0)} Allocated Treasury
             </span>
           </div>
@@ -256,16 +241,16 @@ export default function PolicyCenter() {
           {/* Left Column: Spending Thresholds & Budget */}
           <div className="space-y-6">
             {/* Control 1: Auto Approval Threshold */}
-            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E6E8EC] shadow-xs space-y-4">
+            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Sliders className="w-4 h-4 text-[#2563EB]" />
-                    <h3 className="text-[16px] font-bold text-[#171A21]">
+                    <h3 className="text-[16px] font-bold text-[#0F172A]">
                       Automatic Approval Threshold
                     </h3>
                   </div>
-                  <p className="text-[13px] text-[#667085] leading-relaxed">
+                  <p className="text-[13px] text-[#475467] leading-relaxed">
                     Purchases at or below this value execute autonomously. Purchases exceeding this limit are quarantined into the Approvals Queue for human sign-off.
                   </p>
                 </div>
@@ -284,9 +269,9 @@ export default function PolicyCenter() {
                   step="50"
                   value={autoApproveLimit}
                   onChange={(e) => handleLimitChange(e.target.value)}
-                  className="w-full h-2.5 bg-[#E6E8EC] rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
+                  className="w-full h-2.5 bg-[#E2E8F0] rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
                 />
-                <div className="flex justify-between text-[12px] font-medium text-[#667085] mt-2">
+                <div className="flex justify-between text-[12px] font-medium text-[#64748B] mt-2">
                   <span>$100 (Strict)</span>
                   <span>$1,000 (Default)</span>
                   <span>$3,000 (Permissive)</span>
@@ -295,22 +280,22 @@ export default function PolicyCenter() {
             </div>
 
             {/* Control 2: Total Budget Pool */}
-            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E6E8EC] shadow-xs space-y-4">
+            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <DollarSign className="w-4 h-4 text-[#15803D]" />
-                  <h3 className="text-[16px] font-bold text-[#171A21]">
+                  <DollarSign className="w-4 h-4 text-[#2563EB]" />
+                  <h3 className="text-[16px] font-bold text-[#0F172A]">
                     Total Treasury Budget Allocation
                   </h3>
                 </div>
-                <p className="text-[13px] text-[#667085] leading-relaxed">
+                <p className="text-[13px] text-[#475467] leading-relaxed">
                   Cumulative financial ceiling available across all autonomous agent procurement activities. Enforced atomically via database transactions.
                 </p>
               </div>
 
               <div className="max-w-xs">
                 <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 text-[#667085] text-[15px] font-semibold">$</span>
+                  <span className="absolute left-3.5 top-2.5 text-[#64748B] text-[15px] font-semibold">$</span>
                   <input
                     type="number"
                     min="500"
@@ -318,38 +303,38 @@ export default function PolicyCenter() {
                     step="100"
                     value={totalBudget}
                     onChange={(e) => handleBudgetChange(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2 rounded-lg border border-[#E6E8EC] text-[15px] font-semibold text-[#171A21] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] bg-[#FFFFFF] tabular-nums"
+                    className="w-full pl-8 pr-4 py-2 rounded-lg border border-[#E2E8F0] text-[15px] font-semibold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] bg-[#FFFFFF] tabular-nums"
                   />
                 </div>
               </div>
             </div>
 
             {/* Control 3: Strict Security Invariants */}
-            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E6E8EC] shadow-xs space-y-3">
+            <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-[#B45309]" />
-                <h3 className="text-[15px] font-bold text-[#171A21]">Active Zero-Trust Invariants</h3>
+                <Lock className="w-4 h-4 text-[#2563EB]" />
+                <h3 className="text-[15px] font-bold text-[#0F172A]">Active Zero-Trust Invariants</h3>
               </div>
-              <p className="text-[13px] text-[#667085]">
+              <p className="text-[13px] text-[#475467]">
                 Hardcoded server guardrails actively protecting your treasury:
               </p>
 
               <div className="grid grid-cols-1 gap-3 pt-1">
-                <div className="p-3.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC]">
-                  <span className="text-[13px] font-bold text-[#171A21] flex items-center gap-1.5">
+                <div className="p-3.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                  <span className="text-[13px] font-bold text-[#0F172A] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
                     Server Price Lock Protection
                   </span>
-                  <p className="text-[#667085] text-[12px] mt-1 leading-relaxed">
+                  <p className="text-[#64748B] text-[12px] mt-1 leading-relaxed">
                     Browser-submitted price overrides are rejected. PayPal orders strictly bind to immutable backend deal records.
                   </p>
                 </div>
-                <div className="p-3.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC]">
-                  <span className="text-[13px] font-bold text-[#171A21] flex items-center gap-1.5">
+                <div className="p-3.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                  <span className="text-[13px] font-bold text-[#0F172A] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#15803D]" />
                     Atomic Replay & Double-Capture Defense
                   </span>
-                  <p className="text-[#667085] text-[12px] mt-1 leading-relaxed">
+                  <p className="text-[#64748B] text-[12px] mt-1 leading-relaxed">
                     Replaying captured tokens halts atomically without duplicate treasury balance deductions.
                   </p>
                 </div>
@@ -358,13 +343,13 @@ export default function PolicyCenter() {
           </div>
 
           {/* Right Column: Permitted Service Categories Whitelist */}
-          <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E6E8EC] shadow-xs space-y-4 flex flex-col justify-between">
+          <div className="bg-[#FFFFFF] p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div>
-                <h3 className="text-[16px] font-bold text-[#171A21]">
+                <h3 className="text-[16px] font-bold text-[#0F172A]">
                   Permitted Service Categories (Whitelist)
                 </h3>
-                <p className="text-[13px] text-[#667085] mt-1 leading-relaxed">
+                <p className="text-[13px] text-[#475467] mt-1 leading-relaxed">
                   Autonomous agents can only solicit and settle services in enabled categories. Any purchase request in an unchecked category is immediately blocked by the policy engine.
                 </p>
               </div>
@@ -379,23 +364,23 @@ export default function PolicyCenter() {
                       onClick={() => handleToggleService(svc.id)}
                       className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-4 ${
                         isChecked
-                          ? `bg-[#FFFFFF] ${svc.borderActive} shadow-xs`
-                          : 'bg-[#FAFAFC] border-[#E6E8EC] opacity-60 hover:opacity-80'
+                          ? 'bg-[#FFFFFF] border-[#2563EB] shadow-xs ring-1 ring-[#2563EB]/20'
+                          : 'bg-[#F8FAFC] border-[#E2E8F0] opacity-60 hover:opacity-80'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
                           className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                            isChecked ? `${svc.tagBg} ${svc.tagText}` : 'bg-[#E6E8EC] text-[#667085]'
+                            isChecked ? 'bg-[#EFF4FF] text-[#2563EB]' : 'bg-[#E2E8F0] text-[#64748B]'
                           }`}
                         >
                           <Icon className="w-4 h-4 stroke-[2]" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[14px] font-bold text-[#171A21] block truncate">
+                          <span className="text-[14px] font-bold text-[#0F172A] block truncate">
                             {svc.name}
                           </span>
-                          <span className="text-[12px] text-[#667085] block truncate mt-0.5">
+                          <span className="text-[12px] text-[#64748B] block truncate mt-0.5">
                             {svc.desc}
                           </span>
                         </div>
@@ -416,18 +401,18 @@ export default function PolicyCenter() {
               </div>
             </div>
 
-            <div className="p-3 bg-[#F7F8FA] rounded-lg border border-[#E6E8EC] text-[12px] text-[#667085]">
-              Active Categories: <strong className="text-[#171A21]">{allowedServices.length} of 5 whitelisted</strong>
+            <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] text-[12px] text-[#64748B]">
+              Active Categories: <strong className="text-[#0F172A]">{allowedServices.length} of 5 whitelisted</strong>
             </div>
           </div>
         </div>
 
         {/* Form Actions Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] shadow-xs">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] shadow-xs">
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="w-full sm:w-auto px-4 py-2.5 text-[13px] font-semibold text-[#667085] hover:text-[#171A21] bg-[#FFFFFF] hover:bg-[#F7F8FA] border border-[#E6E8EC] rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-4 py-2.5 text-[13px] font-semibold text-[#475467] hover:text-[#0F172A] bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span>Reset Standard Defaults ($1,000 / $5,000)</span>

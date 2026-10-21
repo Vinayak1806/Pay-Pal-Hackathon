@@ -35,7 +35,7 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
   const title = getPageTitle(location.pathname);
 
   return (
-    <header className="h-16 bg-[#FFFFFF] border-b border-[#E6E8EC] sticky top-0 z-30 flex items-center justify-between px-5 md:px-8">
+    <header className="h-16 bg-[#FFFFFF] border-b border-[#E2E8F0] sticky top-0 z-30 flex items-center justify-between px-5 md:px-8">
       <div className="flex items-center gap-2.5">
         {!sidebarOpen && (
           <>
@@ -47,7 +47,7 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
             >
               <PanelLeft className="w-[18px] h-[18px] stroke-[2] transition-transform group-hover:translate-x-0.5" />
             </button>
-            <div className="h-4 w-px bg-[#E6E8EC] hidden md:block" />
+            <div className="h-4 w-px bg-[#E2E8F0] hidden md:block" />
           </>
         )}
         <button

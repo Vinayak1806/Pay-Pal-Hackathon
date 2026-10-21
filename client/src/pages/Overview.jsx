@@ -62,13 +62,13 @@ export default function Overview() {
   const completedDeals = deals.filter(d => d.status === 'payment_completed');
   const totalActionableApprovals = pendingDeals.length + unpaidAuthorizedDeals.length;
 
-  // Category spend metrics from settled deals
+  // Category spend metrics from settled deals - Harmonious enterprise palette
   const categoriesList = [
     { key: 'presentation', label: 'Presentation', color: '#2563EB' },
-    { key: 'website', label: 'Website', color: '#15803D' },
-    { key: 'research', label: 'Research', color: '#7C3AED' },
-    { key: 'content', label: 'Content', color: '#D97706' },
-    { key: 'design', label: 'Design', color: '#059669' }
+    { key: 'website', label: 'Website', color: '#3B82F6' },
+    { key: 'research', label: 'Research', color: '#60A5FA' },
+    { key: 'content', label: 'Content', color: '#64748B' },
+    { key: 'design', label: 'Design', color: '#94A3B8' }
   ];
 
   const categoryMetrics = categoriesList.map(cat => {
@@ -95,7 +95,7 @@ export default function Overview() {
       reason = d.blockedReason || 'Exceeds auto-approval limit';
     } else if (d.status === 'approved') {
       outcome = 'Authorized (Unpaid)';
-      outcomeClass = 'text-[#047857] bg-[#ECFDF5] border-[#A7F3D0]';
+      outcomeClass = 'text-[#15803D] bg-[#F0FDF4] border-[#BBF7D0]';
       reason = 'Authorized by supervisor — ready for PayPal checkout';
     } else if (d.status === 'checkout_created') {
       outcome = 'Checkout Created';
@@ -134,10 +134,10 @@ export default function Overview() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#E6E8EC]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0]">
         <div>
-          <h2 className="text-[26px] font-bold text-[#171A21] tracking-tight">Overview</h2>
-          <p className="text-[14px] text-[#667085] mt-1">
+          <h2 className="text-[26px] font-bold text-[#0F172A] tracking-tight">Overview</h2>
+          <p className="text-[14px] text-[#475467] mt-1">
             Monitor autonomous AI agent purchasing activity, treasury allocations, and policy controls.
           </p>
         </div>
@@ -153,9 +153,9 @@ export default function Overview() {
       {/* 4 Summary KPI Cards with Clear Logical Colors & Readable Fonts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Total Spend - Brand Blue */}
-        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-xs hover:border-[#BFDBFE] transition-colors">
+        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E2E8F0] shadow-xs hover:border-[#BFDBFE] transition-colors">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[13px] font-semibold text-[#171A21]">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
               Total Settled Spend
             </span>
             <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
@@ -164,17 +164,17 @@ export default function Overview() {
             <span className="text-[28px] font-bold text-[#2563EB] tabular-nums tracking-tight">
               ${spent.toFixed(2)}
             </span>
-            <span className="text-[12px] text-[#667085] font-medium">
+            <span className="text-[12px] text-[#64748B] font-medium">
               of ${total.toFixed(0)} cap
             </span>
           </div>
-          <div className="w-full h-2 bg-[#F0F2F5] rounded-full overflow-hidden mt-3">
+          <div className="w-full h-2 bg-[#F1F5F9] rounded-full overflow-hidden mt-3">
             <div
               style={{ width: `${Math.min(100, (spent / total) * 100)}%` }}
               className="bg-[#2563EB] h-full rounded-full transition-all duration-300"
             />
           </div>
-          <div className="flex justify-between items-center text-[12px] font-medium text-[#667085] mt-2.5">
+          <div className="flex justify-between items-center text-[12px] font-medium text-[#64748B] mt-2.5">
             <span>Avail: ${remaining.toFixed(0)}</span>
             <span>Escrow: ${committed.toFixed(0)}</span>
           </div>
@@ -186,10 +186,10 @@ export default function Overview() {
             ? 'border-[#BBF7D0] hover:border-[#86EFAC]'
             : pendingDeals.length > 0
             ? 'border-[#FED7AA] hover:border-[#FDBA74]'
-            : 'border-[#E6E8EC] hover:border-[#D0D5DD]'
+            : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
         }`}>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[13px] font-semibold text-[#171A21]">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
               Approvals &amp; Unpaid
             </span>
             <Link to="/approvals" className="text-[12px] text-[#2563EB] hover:underline font-semibold">
@@ -207,12 +207,12 @@ export default function Overview() {
               {totalActionableApprovals}
             </span>
             {unpaidAuthorizedDeals.length > 0 && (
-              <span className="text-[11px] font-bold text-[#047857] bg-[#ECFDF5] px-2 py-0.5 rounded-full border border-[#A7F3D0]">
+              <span className="text-[11px] font-bold text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded-full border border-[#BBF7D0]">
                 {unpaidAuthorizedDeals.length} Ready to Pay
               </span>
             )}
           </div>
-          <p className="text-[12px] text-[#667085] mt-2.5 leading-relaxed">
+          <p className="text-[12px] text-[#64748B] mt-2.5 leading-relaxed">
             {totalActionableApprovals === 0
               ? 'All transactions settled or within automatic limits'
               : pendingDeals.length > 0 && unpaidAuthorizedDeals.length > 0
@@ -224,9 +224,9 @@ export default function Overview() {
         </div>
 
         {/* KPI 3: Blocked Transactions - Crimson Danger */}
-        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-xs hover:border-[#FECACA] transition-colors">
+        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E2E8F0] shadow-xs hover:border-[#FECACA] transition-colors">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[13px] font-semibold text-[#171A21]">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
               Blocked Transactions
             </span>
             <span className="w-2.5 h-2.5 rounded-full bg-[#B42318]" />
@@ -234,27 +234,27 @@ export default function Overview() {
           <span className="text-[28px] font-bold text-[#B42318] tabular-nums tracking-tight block">
             {blockedDeals.length}
           </span>
-          <p className="text-[12px] text-[#667085] mt-3 leading-relaxed">
+          <p className="text-[12px] text-[#64748B] mt-3 leading-relaxed">
             {blockedDeals.length === 0
               ? 'Zero policy violations detected'
               : 'Stopped by spending limits or category filters'}
           </p>
         </div>
 
-        {/* KPI 4: Active AI Agents - Emerald Verified */}
-        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-xs hover:border-[#BBF7D0] transition-colors">
+        {/* KPI 4: Active AI Agents - Unified Neutral High-Trust Metric */}
+        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E2E8F0] shadow-xs hover:border-[#CBD5E1] transition-colors">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[13px] font-semibold text-[#171A21]">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
               Registered Agents
             </span>
             <Link to="/agents" className="text-[12px] text-[#2563EB] hover:underline font-semibold">
               Directory &rarr;
             </Link>
           </div>
-          <span className="text-[28px] font-bold text-[#15803D] tabular-nums tracking-tight block">
+          <span className="text-[28px] font-bold text-[#0F172A] tabular-nums tracking-tight block">
             4 Active
           </span>
-          <p className="text-[12px] text-[#667085] mt-3 leading-relaxed">
+          <p className="text-[12px] text-[#64748B] mt-3 leading-relaxed">
             1 Buyer agent, 3 specialized seller agents
           </p>
         </div>
@@ -263,11 +263,11 @@ export default function Overview() {
       {/* Two Column Layout: Spending Breakdown + Policy Decisions Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Spending Allocation / Activity */}
-        <div className="lg:col-span-2 bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-card space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E6E8EC]">
+        <div className="lg:col-span-2 bg-[#FFFFFF] p-5 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
             <div>
-              <h3 className="text-[14px] font-semibold text-[#171A21]">Spending Policy Allocation</h3>
-              <p className="text-[12px] text-[#667085]">Real-time treasury distribution enforced by deterministic rules</p>
+              <h3 className="text-[14px] font-semibold text-[#0F172A]">Spending Policy Allocation</h3>
+              <p className="text-[12px] text-[#64748B]">Real-time treasury distribution enforced by deterministic rules</p>
             </div>
             <Link to="/policy" className="text-[12px] text-[#2563EB] hover:underline font-medium">
               Configure limits &rarr;
@@ -276,7 +276,7 @@ export default function Overview() {
 
           {/* Allocation Bar */}
           <div className="space-y-2">
-            <div className="w-full h-3 bg-[#F0F2F5] rounded-full overflow-hidden flex">
+            <div className="w-full h-3 bg-[#F1F5F9] rounded-full overflow-hidden flex">
               <div
                 style={{ width: `${Math.min(100, (spent / total) * 100)}%` }}
                 className="bg-[#2563EB] h-full"
@@ -290,58 +290,58 @@ export default function Overview() {
             </div>
 
             <div className="grid grid-cols-3 gap-3 pt-2 text-[12px]">
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC]">
-                <div className="flex items-center gap-1.5 text-[#667085] mb-0.5">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                <div className="flex items-center gap-1.5 text-[#64748B] mb-0.5">
                   <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
                   <span>Settled (Spent)</span>
                 </div>
-                <span className="font-semibold text-[#171A21] tabular-nums block">${spent.toFixed(2)}</span>
+                <span className="font-semibold text-[#0F172A] tabular-nums block">${spent.toFixed(2)}</span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC]">
-                <div className="flex items-center gap-1.5 text-[#667085] mb-0.5">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                <div className="flex items-center gap-1.5 text-[#64748B] mb-0.5">
                   <span className="w-2 h-2 rounded-full bg-[#D97706]" />
                   <span>Committed (Escrow)</span>
                 </div>
-                <span className="font-semibold text-[#171A21] tabular-nums block">${committed.toFixed(2)}</span>
+                <span className="font-semibold text-[#0F172A] tabular-nums block">${committed.toFixed(2)}</span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC]">
-                <div className="flex items-center gap-1.5 text-[#667085] mb-0.5">
-                  <span className="w-2 h-2 rounded-full bg-[#D0D5DD]" />
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                <div className="flex items-center gap-1.5 text-[#64748B] mb-0.5">
+                  <span className="w-2 h-2 rounded-full bg-[#CBD5E1]" />
                   <span>Available Balance</span>
                 </div>
-                <span className="font-semibold text-[#171A21] tabular-nums block">${remaining.toFixed(2)}</span>
+                <span className="font-semibold text-[#0F172A] tabular-nums block">${remaining.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-2 text-[12px] text-[#667085] flex items-center justify-between border-t border-[#E6E8EC]">
-            <span>Automatic Approval Threshold: <strong className="text-[#171A21]">${policy?.autoApproveLimit ?? 1000}</strong></span>
-            <span>Whitelisted Categories: <strong className="text-[#171A21]">{policy?.allowedServices?.length || 5} active</strong></span>
+          <div className="pt-2 text-[12px] text-[#64748B] flex items-center justify-between border-t border-[#E2E8F0]">
+            <span>Automatic Approval Threshold: <strong className="text-[#0F172A]">${policy?.autoApproveLimit ?? 1000}</strong></span>
+            <span>Whitelisted Categories: <strong className="text-[#0F172A]">{policy?.allowedServices?.length || 5} active</strong></span>
           </div>
 
-          {/* Whitelisted Category Breakdown */}
-          <div className="space-y-2 pt-2 border-t border-[#E6E8EC]">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-[#667085] uppercase tracking-wider">
+          {/* Category Spend Distribution */}
+          <div className="space-y-2 pt-2 border-t border-[#E2E8F0]">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
               <span>Category Spend Distribution</span>
               <span>Settled Volume</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
               {categoryMetrics.map(cat => (
-                <div key={cat.key} className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex flex-col justify-between">
+                <div key={cat.key} className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] font-bold text-[#171A21] truncate">{cat.label}</span>
-                    <span className="text-[10px] text-[#667085]">{cat.count} deal{cat.count === 1 ? '' : 's'}</span>
+                    <span className="text-[11px] font-bold text-[#0F172A] truncate">{cat.label}</span>
+                    <span className="text-[10px] text-[#64748B]">{cat.count} deal{cat.count === 1 ? '' : 's'}</span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-[12px] font-bold text-[#171A21] tabular-nums">${cat.spent.toFixed(0)}</span>
-                    <span className="text-[10px] font-semibold text-[#667085]">{cat.percent}%</span>
+                    <span className="text-[12px] font-bold text-[#0F172A] tabular-nums">${cat.spent.toFixed(0)}</span>
+                    <span className="text-[10px] font-semibold text-[#64748B]">{cat.percent}%</span>
                   </div>
-                  <div className="w-full h-1 bg-[#E6E8EC] rounded-full overflow-hidden mt-1.5">
+                  <div className="w-full h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden mt-1.5">
                     <div
                       style={{ width: `${Math.max(cat.percent > 0 ? 8 : 0, cat.percent)}%`, backgroundColor: cat.color }}
-                      className="h-full rounded-full"
+                      className="h-full rounded-full transition-all"
                     />
                   </div>
                 </div>
@@ -350,55 +350,55 @@ export default function Overview() {
           </div>
 
           {/* Active Deterministic Guardrails Matrix */}
-          <div className="pt-2.5 border-t border-[#E6E8EC] space-y-2">
+          <div className="pt-2.5 border-t border-[#E2E8F0] space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-[#667085] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#15803D]" />
                 Active Deterministic Guardrails
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded-md border border-[#BBF7D0]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#15803D]" />
                 100% Policy Compliance
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Lock className="w-3.5 h-3.5 text-[#2563EB]" />
-                  <span className="text-[#344054] font-medium">Replay & Duplicate Shield</span>
+                  <span className="text-[#334155] font-medium">Replay & Duplicate Shield</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#BBF7D0]">
                   Gated (409)
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
-                  <span className="text-[#344054] font-medium">Server Price Binding</span>
+                  <span className="text-[#334155] font-medium">Server Price Binding</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#BBF7D0]">
                   Enforced
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-[#B45309]" />
-                  <span className="text-[#344054] font-medium">Supervisor Auto-Ceiling</span>
+                  <span className="text-[#334155] font-medium">Supervisor Auto-Ceiling</span>
                 </div>
                 <span className="text-[11px] font-bold text-[#B45309] bg-[#FFFBEB] px-2 py-0.5 rounded border border-[#FED7AA]">
                   &gt; ${policy?.autoApproveLimit ?? 1000} Review
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] flex items-center justify-between">
+              <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5 text-[#2563EB]" />
-                  <span className="text-[#344054] font-medium">Cryptographic Ledger Sync</span>
+                  <span className="text-[#334155] font-medium">Cryptographic Ledger Sync</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded border border-[#BBF7D0]">
+                <span className="text-[11px] font-bold text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#BBF7D0]">
                   SHA-256 Verified
                 </span>
               </div>
@@ -407,28 +407,28 @@ export default function Overview() {
         </div>
 
         {/* Policy Decisions Activity Feed */}
-        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E6E8EC] shadow-card space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E6E8EC]">
-            <h3 className="text-[14px] font-semibold text-[#171A21]">Recent Policy Decisions</h3>
+        <div className="bg-[#FFFFFF] p-5 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
+            <h3 className="text-[14px] font-semibold text-[#0F172A]">Recent Policy Decisions</h3>
             <Link to="/audit" className="text-[12px] text-[#2563EB] hover:underline font-medium">
               Audit trail
             </Link>
           </div>
 
           {recentDecisions.length === 0 ? (
-            <p className="text-[12px] text-[#667085] py-6 text-center">No policy events recorded yet.</p>
+            <p className="text-[12px] text-[#64748B] py-6 text-center">No policy events recorded yet.</p>
           ) : (
             <div className="space-y-3">
               {recentDecisions.map((item, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-[#F7F8FA] border border-[#E6E8EC] space-y-1">
+                <div key={idx} className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-semibold text-[#171A21] capitalize">{item.service}</span>
+                    <span className="font-semibold text-[#0F172A] capitalize">{item.service}</span>
                     <span className={`px-2 py-0.5 rounded-md font-medium border text-[10px] ${item.outcomeClass}`}>
                       {item.outcome}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#667085] line-clamp-1">{item.reason}</p>
-                  <div className="flex justify-between items-center text-[10px] text-[#98A2B3] pt-1">
+                  <p className="text-[11px] text-[#64748B] line-clamp-1">{item.reason}</p>
+                  <div className="flex justify-between items-center text-[10px] text-[#94A3B8] pt-1">
                     <span>${item.amount?.toFixed(2)} USD</span>
                     <span>{new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
@@ -440,11 +440,11 @@ export default function Overview() {
       </div>
 
       {/* Recent Transactions Table */}
-      <div className="bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] shadow-card overflow-hidden">
-        <div className="p-5 border-b border-[#E6E8EC] flex items-center justify-between">
+      <div className="bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-[#E2E8F0] flex items-center justify-between">
           <div>
-            <h3 className="text-[14px] font-semibold text-[#171A21]">Recent Transactions</h3>
-            <p className="text-[12px] text-[#667085]">Verified transactions executed via PayPal Orders v2 Sandbox</p>
+            <h3 className="text-[14px] font-semibold text-[#0F172A]">Recent Transactions</h3>
+            <p className="text-[12px] text-[#64748B]">Verified transactions executed via PayPal Orders v2 Sandbox</p>
           </div>
           <Link
             to="/transactions"
@@ -455,13 +455,13 @@ export default function Overview() {
         </div>
 
         {deals.length === 0 ? (
-          <div className="p-8 text-center text-[13px] text-[#667085]">
+          <div className="p-8 text-center text-[13px] text-[#64748B]">
             No transactions found. Click "New Purchase Request" to initiate your first autonomous procurement flow.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[13px]">
-              <thead className="bg-[#F7F8FA] border-b border-[#E6E8EC] text-[11px] font-semibold uppercase tracking-wider text-[#667085]">
+              <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-semibold uppercase tracking-wider text-[#475467]">
                 <tr>
                   <th className="py-2.5 px-5">Deal ID</th>
                   <th className="py-2.5 px-5">Service</th>
@@ -472,25 +472,25 @@ export default function Overview() {
                   <th className="py-2.5 px-5 text-right">Deliverable</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E6E8EC] text-[#171A21]">
+              <tbody className="divide-y divide-[#E2E8F0] text-[#0F172A]">
                 {deals.slice(0, 6).map((deal) => (
-                  <tr key={deal.dealId} className="hover:bg-[#F7F8FA]/60 transition-colors">
-                    <td className="py-3 px-5 font-mono text-[12px] text-[#667085]">
+                  <tr key={deal.dealId} className="hover:bg-[#F8FAFC] transition-colors">
+                    <td className="py-3 px-5 font-mono text-[12px] text-[#64748B]">
                       {deal.dealId?.substring(0, 8)}...
                     </td>
-                    <td className="py-3 px-5 font-medium capitalize text-[#171A21]">
+                    <td className="py-3 px-5 font-medium capitalize text-[#0F172A]">
                       {deal.serviceType}
                     </td>
-                    <td className="py-3 px-5 text-[#667085]">
+                    <td className="py-3 px-5 text-[#475467]">
                       {deal.sellerAgent}
                     </td>
-                    <td className="py-3 px-5 font-semibold text-[#171A21] tabular-nums">
+                    <td className="py-3 px-5 font-semibold text-[#0F172A] tabular-nums">
                       ${deal.agreedAmount?.toFixed(2)}
                     </td>
                     <td className="py-3 px-5">
                       <StatusBadge status={deal.status} />
                     </td>
-                    <td className="py-3 px-5 text-[12px] text-[#667085] whitespace-nowrap">
+                    <td className="py-3 px-5 text-[12px] text-[#64748B] whitespace-nowrap">
                       {new Date(deal.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-5 text-right">
@@ -505,7 +505,7 @@ export default function Overview() {
                           View Artifact
                         </button>
                       ) : (
-                        <span className="text-[#98A2B3] text-[12px]">—</span>
+                        <span className="text-[#94A3B8] text-[12px]">—</span>
                       )}
                     </td>
                   </tr>

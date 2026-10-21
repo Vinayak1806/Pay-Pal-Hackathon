@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { dealService, demoService, policyService } from '../services/api';
 import toast from 'react-hot-toast';
+import Logo from './Logo';
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -99,26 +100,14 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 w-60 bg-[#FFFFFF] border-r border-[#E6E8EC] z-50 flex flex-col justify-between transition-transform duration-200 ${
+        className={`fixed top-0 bottom-0 left-0 w-60 bg-[#FFFFFF] border-r border-[#E2E8F0] z-50 flex flex-col justify-between transition-transform duration-200 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div>
           {/* Logo & Header */}
-          <div className="h-16 px-5 border-b border-[#E6E8EC] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
-                <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
-              </div>
-              <div>
-                <span className="font-semibold text-[15px] tracking-tight text-[#171A21] block leading-none">
-                  SpendMesh <span className="text-[#2563EB]">AI</span>
-                </span>
-                <span className="text-[10px] text-[#667085] font-normal block mt-1 tracking-tight">
-                  Financial Policy Layer
-                </span>
-              </div>
-            </div>
+          <div className="h-16 px-5 border-b border-[#E2E8F0] flex items-center justify-between">
+            <Logo size={32} subtitle="Financial Policy Layer" />
 
             <button
               onClick={onClose}
@@ -180,22 +169,22 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
 
         {/* Footer Area: Budget Summary & Demo Reset */}
-        <div className="p-4 border-t border-[#E6E8EC] space-y-3 bg-[#FAFAFC]">
+        <div className="p-4 border-t border-[#E2E8F0] space-y-3 bg-[#FAFAFC]">
           {/* Compact Budget Micro-Widget */}
-          <div className="p-3.5 bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] space-y-2 shadow-2xs">
+          <div className="p-3.5 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] space-y-2 shadow-2xs">
             <div className="flex items-center justify-between text-[12px]">
-              <span className="text-[#667085] font-semibold">Policy Budget</span>
-              <span className="font-bold text-[#171A21] tabular-nums">
+              <span className="text-[#475467] font-semibold">Policy Budget</span>
+              <span className="font-bold text-[#0F172A] tabular-nums">
                 ${spent.toFixed(0)} / ${total.toFixed(0)}
               </span>
             </div>
-            <div className="w-full h-2 bg-[#F0F2F5] rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-[#F1F5F9] rounded-full overflow-hidden">
               <div
                 style={{ width: `${spentPercent}%` }}
                 className="bg-[#2563EB] h-full transition-all duration-300 rounded-full"
               />
             </div>
-            <div className="flex justify-between text-[11px] font-medium text-[#667085]">
+            <div className="flex justify-between text-[11px] font-medium text-[#64748B]">
               <span>Avail: ${remaining.toFixed(0)}</span>
               <span>Limit: ${policy?.autoApproveLimit ?? 1000}</span>
             </div>
@@ -205,7 +194,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <button
             onClick={() => setShowConfirm(true)}
             disabled={resetting}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-[13px] font-semibold text-[#667085] hover:text-[#171A21] bg-[#FFFFFF] hover:bg-[#F7F8FA] border border-[#E6E8EC] rounded-lg transition-colors disabled:opacity-50 shadow-2xs"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-[13px] font-semibold text-[#475467] hover:text-[#0F172A] bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg transition-colors disabled:opacity-50 shadow-2xs"
           >
             {resetting ? (
               <>
@@ -225,20 +214,20 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-sm w-full p-6 border border-[#E6E8EC] animate-in fade-in zoom-in-95">
+          <div className="bg-[#FFFFFF] rounded-xl shadow-popover max-w-sm w-full p-6 border border-[#E2E8F0] animate-in fade-in zoom-in-95">
             <div className="w-10 h-10 rounded-lg bg-[#FEF2F2] text-[#B42318] flex items-center justify-center mb-4">
               <AlertCircle className="w-5 h-5" />
             </div>
-            <h4 className="text-[15px] font-semibold text-[#171A21] mb-1">
+            <h4 className="text-[15px] font-semibold text-[#0F172A] mb-1">
               Reset Demo Environment?
             </h4>
-            <p className="text-[13px] text-[#667085] mb-5 leading-relaxed">
+            <p className="text-[13px] text-[#475467] mb-5 leading-relaxed">
               This will clear recent test deals, captured payments, and reset the policy budget back to $5,000 for a fresh judge demonstration.
             </p>
             <div className="flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-3.5 py-1.5 text-[13px] font-medium text-[#667085] hover:text-[#171A21] bg-[#FFFFFF] hover:bg-[#F7F8FA] border border-[#E6E8EC] rounded-lg transition-colors"
+                className="px-3.5 py-1.5 text-[13px] font-medium text-[#475467] hover:text-[#0F172A] bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg transition-colors"
               >
                 Cancel
               </button>

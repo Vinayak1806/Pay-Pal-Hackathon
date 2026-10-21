@@ -993,7 +993,7 @@ export default function Marketplace() {
 
           {/* Loading View */}
           {loading && (
-            <div className="bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] p-8 shadow-card">
+            <div className="bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] p-8 shadow-xs">
               <LoadingSpinner message={loadingMessage} size="md" />
             </div>
           )}

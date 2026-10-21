@@ -106,23 +106,23 @@ export default function PaymentSuccess() {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto my-16 bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] p-8 text-center shadow-xs">
+      <div className="max-w-md mx-auto my-16 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] p-8 text-center shadow-xs">
         <LoadingSpinner message="Capturing settlement on PayPal Sandbox..." />
-        <p className="text-[11px] text-[#667085] mt-4 font-mono">Order Token: {token}</p>
+        <p className="text-[11px] text-[#64748B] mt-4 font-mono">Order Token: {token}</p>
       </div>
     );
   }
 
   if (duplicate) {
     return (
-      <div className="max-w-md mx-auto my-16 bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] p-8 text-center shadow-xs">
-        <div className="w-12 h-12 bg-[#FFFBEB] text-[#B45309] rounded-xl flex items-center justify-center mx-auto mb-4">
+      <div className="max-w-md mx-auto my-16 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] p-8 text-center shadow-xs">
+        <div className="w-12 h-12 bg-[#FFFBEB] text-[#B45309] rounded-xl flex items-center justify-center mx-auto mb-4 border border-[#FED7AA]">
           <AlertTriangle className="w-6 h-6 stroke-[2]" />
         </div>
-        <h2 className="text-[17px] font-semibold text-[#171A21] mb-2">
+        <h2 className="text-[17px] font-bold text-[#0F172A] mb-2">
           Payment Already Processed
         </h2>
-        <p className="text-[13px] text-[#667085] leading-relaxed mb-6">
+        <p className="text-[13px] text-[#475467] leading-relaxed mb-6">
           This payment token has already been captured and settled. The SpendMesh guardrail prevented replay and duplicate balance deduction.
         </p>
         <div className="flex justify-center gap-3">
@@ -134,7 +134,7 @@ export default function PaymentSuccess() {
           </Link>
           <Link
             to="/requests"
-            className="px-4 py-2 bg-[#FFFFFF] text-[#667085] hover:text-[#171A21] border border-[#E6E8EC] font-medium text-[13px] rounded-lg hover:bg-[#F7F8FA] transition-colors"
+            className="px-4 py-2 bg-[#FFFFFF] text-[#475467] hover:text-[#0F172A] border border-[#E2E8F0] font-medium text-[13px] rounded-lg hover:bg-[#F8FAFC] transition-colors"
           >
             New Request
           </Link>
@@ -328,7 +328,7 @@ export default function PaymentSuccess() {
 
       {/* Unlocked Deliverable */}
       {deliverable && (
-        <div className="bg-[#FFFFFF] rounded-xl border border-[#E6E8EC] p-6 shadow-xs space-y-4">
+        <div className="bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] p-6 shadow-xs space-y-4">
           {/* Card Header & Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#F1F5F9]">
             <div className="flex items-center gap-2.5">
@@ -558,7 +558,7 @@ export default function PaymentSuccess() {
       )}
 
       {/* Navigation & Receipt Actions Toolbar */}
-      <div className="bg-[#FFFFFF] border border-[#E6E8EC] p-3.5 sm:p-4 rounded-xl shadow-2xs flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3.5 mt-4">
+      <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-3.5 sm:p-4 rounded-xl shadow-2xs flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3.5 mt-4">
         {/* Document Artifacts */}
         <div className="flex flex-wrap items-center gap-2.5">
           <button
@@ -628,7 +628,7 @@ export default function PaymentSuccess() {
         </div>
 
         {/* Workflow Navigation */}
-        <div className="flex items-center gap-2.5 justify-end pt-3 xl:pt-0 border-t xl:border-t-0 border-[#E6E8EC]">
+        <div className="flex items-center gap-2.5 justify-end pt-3 xl:pt-0 border-t xl:border-t-0 border-[#E2E8F0]">
           <Link
             to="/transactions"
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8FAFC] text-[#475467] hover:text-[#0F172A] font-semibold text-[13px] rounded-lg border border-[#D0D5DD] hover:border-[#98A2B3] shadow-2xs transition-all"

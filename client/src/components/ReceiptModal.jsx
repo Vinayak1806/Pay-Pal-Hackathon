@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ShieldCheck, Printer, CheckCircle, Copy, Award, Check, FileText, Download, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { printReceiptDocument, downloadReceiptPdf } from '../utils/printReceipt';
+import { LogoIcon } from './Logo';
 
 export default function ReceiptModal({ isOpen, onClose, data }) {
   if (!isOpen || !data) return null;
@@ -69,11 +70,9 @@ export default function ReceiptModal({ isOpen, onClose, data }) {
         <div className="p-6 sm:p-7 border-b border-[#E2E8F0] bg-[#FFFFFF] flex items-start justify-between shrink-0">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 mb-1.5">
-              <div className="w-9 h-9 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shadow-xs">
-                <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
-              </div>
+              <LogoIcon size={36} className="shadow-xs" />
               <div>
-                <span className="font-bold text-[18px] text-[#101828] tracking-tight block leading-none">
+                <span className="font-bold text-[18px] text-[#0F172A] tracking-tight block leading-none">
                   SpendMesh <span className="text-[#2563EB]">AI</span>
                 </span>
                 <span className="text-[11px] text-[#64748B] font-medium tracking-tight">

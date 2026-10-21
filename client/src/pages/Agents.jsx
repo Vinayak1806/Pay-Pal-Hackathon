@@ -114,18 +114,10 @@ export default function Agents() {
   ];
 
   const getCategoryBadge = (cat) => {
-    const config = {
-      presentation: 'bg-[#EFF4FF] text-[#2563EB] border-[#BFDBFE]',
-      research: 'bg-[#ECFEFF] text-[#0E7490] border-[#A5F3FC]',
-      website: 'bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]',
-      content: 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]',
-      design: 'bg-[#FFFBEB] text-[#B45309] border-[#FED7AA]'
-    }[cat.toLowerCase()] || 'bg-[#F8FAFC] text-[#475467] border-[#D0D5DD]';
-
     return (
       <span
         key={cat}
-        className={`px-2.5 py-1 rounded-md text-[12px] font-semibold border capitalize ${config}`}
+        className="px-2.5 py-1 rounded-md text-[12px] font-medium border capitalize bg-[#F8FAFC] text-[#334155] border-[#E2E8F0]"
       >
         {cat}
       </span>
