@@ -27,7 +27,11 @@ import {
   Layers,
   Search,
   Sparkles,
-  Copy
+  Copy,
+  Key,
+  HelpCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -86,6 +90,13 @@ export default function Marketplace() {
   });
   const [historySearch, setHistorySearch] = useState('');
   const [historyCategoryFilter, setHistoryCategoryFilter] = useState('all');
+
+  // Sandbox test buyer credentials state
+  const [sandboxEmail, setSandboxEmail] = useState(() => localStorage.getItem('spendmesh_sandbox_email') || 'sb-buyer@business.example.com');
+  const [sandboxPassword, setSandboxPassword] = useState(() => localStorage.getItem('spendmesh_sandbox_password') || '12345678');
+  const [isEditingCredentials, setIsEditingCredentials] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSandboxHelp, setShowSandboxHelp] = useState(false);
 
   // Loading & error states
   const [loading, setLoading] = useState(false);
@@ -1705,23 +1716,131 @@ export default function Marketplace() {
                   Initiates an encrypted server-to-server call to PayPal Orders v2. You will be redirected to PayPal's sandbox gateway to authenticate and approve the transaction.
                 </p>
 
-                <div className="p-3 bg-white border border-[#E2E8F0] rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[12px]">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[#475467] font-semibold">Sandbox Test Buyer:</span>
-                    <code className="text-[#2563EB] font-mono bg-[#EFF6FF] px-2 py-0.5 rounded">sb-buyer@business.example.com</code>
+                <div className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-3 text-[12px]">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#E2E8F0] pb-2">
+                    <div className="flex items-center gap-2 font-semibold text-[#1E293B]">
+                      <Key className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <span>Sandbox Test Buyer Credentials</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowSandboxHelp(prev => !prev)}
+                        className="text-[11px] font-medium text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        <span>{showSandboxHelp ? 'Hide Guide' : 'Where is my password?'}</span>
+                      </button>
+                      <span className="text-[#CBD5E1]">|</span>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingCredentials(prev => !prev)}
+                        className="text-[11px] font-medium text-[#475467] hover:text-[#0F172A] flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                        <span>{isEditingCredentials ? 'Done' : 'Custom Login'}</span>
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText('sb-buyer@business.example.com');
-                      toast.success('Copied test email to clipboard!');
-                    }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-[#475467] hover:text-[#0F172A] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded transition-colors self-start sm:self-auto active:scale-95"
-                    title="Copy sandbox test email"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copy Email</span>
-                  </button>
+
+                  {showSandboxHelp && (
+                    <div className="p-2.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg text-[11.5px] text-[#1E40AF] leading-relaxed space-y-1.5">
+                      <p className="font-semibold text-[#1E3A8A]">How to find your Sandbox Password:</p>
+                      <ol className="list-decimal list-inside space-y-1 text-[#1E40AF]">
+                        <li>Log in to <a href="https://developer.paypal.com/dashboard/accounts" target="_blank" rel="noreferrer" className="underline font-semibold">developer.paypal.com</a> &rarr; <b>Testing Tools</b> &rarr; <b>Sandbox Accounts</b>.</li>
+                        <li>Find the account marked <b>Personal (Buyer)</b> &rarr; Click <b>...</b> &rarr; <b>View/Edit Account</b>.</li>
+                        <li>Copy the <b>System Generated Password</b> (or click "Reset Password").</li>
+                        <li><b>Alternative:</b> On the PayPal checkout screen, click <b>"Pay with Debit or Credit Card"</b> to pay as a guest without entering any password!</li>
+                      </ol>
+                    </div>
+                  )}
+
+                  {isEditingCredentials ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#475467] mb-1">Sandbox Buyer Email</label>
+                        <input
+                          type="email"
+                          value={sandboxEmail}
+                          onChange={(e) => {
+                            setSandboxEmail(e.target.value);
+                            localStorage.setItem('spendmesh_sandbox_email', e.target.value);
+                          }}
+                          className="w-full px-2.5 py-1.5 bg-white border border-[#CBD5E1] rounded text-[12px] font-mono focus:border-[#2563EB] outline-hidden"
+                          placeholder="sb-xxxx@personal.example.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#475467] mb-1">Sandbox Password</label>
+                        <input
+                          type="text"
+                          value={sandboxPassword}
+                          onChange={(e) => {
+                            setSandboxPassword(e.target.value);
+                            localStorage.setItem('spendmesh_sandbox_password', e.target.value);
+                          }}
+                          className="w-full px-2.5 py-1.5 bg-white border border-[#CBD5E1] rounded text-[12px] font-mono focus:border-[#2563EB] outline-hidden"
+                          placeholder="Your Sandbox Password"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {/* Email Row */}
+                      <div className="p-2.5 bg-white border border-[#E2E8F0] rounded-lg flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="block text-[10.5px] font-semibold text-[#64748B] uppercase tracking-wider">Test Buyer Email</span>
+                          <span className="text-[12px] font-mono text-[#0F172A] truncate block font-medium" title={sandboxEmail}>
+                            {sandboxEmail}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(sandboxEmail);
+                            toast.success('Copied test email to clipboard!');
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] bg-[#EFF6FF] hover:bg-[#DBEAFE] rounded transition-colors shrink-0 active:scale-95 cursor-pointer"
+                          title="Copy test email"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Copy</span>
+                        </button>
+                      </div>
+
+                      {/* Password Row */}
+                      <div className="p-2.5 bg-white border border-[#E2E8F0] rounded-lg flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-[10.5px] font-semibold text-[#64748B] uppercase tracking-wider">Sandbox Password</span>
+                          <span className="text-[12px] font-mono text-[#0F172A] truncate block font-medium">
+                            {showPassword ? sandboxPassword : '••••••••••••'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(prev => !prev)}
+                            className="p-1 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded transition-colors cursor-pointer"
+                            title={showPassword ? 'Hide password' : 'Show password'}
+                          >
+                            {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(sandboxPassword);
+                              toast.success('Copied test password to clipboard!');
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] bg-[#EFF6FF] hover:bg-[#DBEAFE] rounded transition-colors active:scale-95 cursor-pointer"
+                            title="Copy test password"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
