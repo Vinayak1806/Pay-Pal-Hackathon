@@ -27,7 +27,10 @@ import {
   Layers,
   Search,
   Sparkles,
-  Copy
+  Copy,
+  Mic,
+  MicOff,
+  X
 } from 'lucide-react';
 import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -87,6 +90,58 @@ export default function Marketplace() {
   const [historySearch, setHistorySearch] = useState('');
   const [historyCategoryFilter, setHistoryCategoryFilter] = useState('all');
 
+  // Voice dictation state
+  const [isListening, setIsListening] = useState(false);
+
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Voice dictation is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        toast('Listening... Speak your procurement request now', { icon: '🎙️', duration: 3000 });
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setTaskInput(prev => (prev ? `${prev.trim()} ${transcript}` : transcript));
+          toast.success('Voice captured!');
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error !== 'no-speech') {
+          toast.error(`Microphone error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('Speech recognition exception:', err);
+      setIsListening(false);
+    }
+  };
 
   // Loading & error states
   const [loading, setLoading] = useState(false);
@@ -212,12 +267,12 @@ export default function Marketplace() {
   }, []);
 
   const exampleChips = [
-    { label: 'Pitch Deck ($400)', prompt: 'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400' },
-    { label: 'FinTech Microservice ($850)', prompt: 'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850' },
-    { label: 'Security Audit ($450)', prompt: 'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450' },
-    { label: 'RAG Pipeline ($650)', prompt: 'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650' },
-    { label: 'Competitor Analysis ($300)', prompt: 'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300' },
-    { label: 'SaaS Landing Page ($500)', prompt: 'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500' }
+    { icon: '📊', label: 'Pitch Deck ($400)', category: 'Presentation', prompt: 'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400' },
+    { icon: '⚡', label: 'FinTech Microservice ($850)', category: 'Engineering', prompt: 'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850' },
+    { icon: '🛡️', label: 'Security Audit ($450)', category: 'Security', prompt: 'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450' },
+    { icon: '🧠', label: 'RAG Pipeline ($650)', category: 'AI Architecture', prompt: 'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650' },
+    { icon: '🔍', label: 'Competitor Analysis ($300)', category: 'Research', prompt: 'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300' },
+    { icon: '💻', label: 'SaaS Landing Page ($500)', category: 'Web Design', prompt: 'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500' }
   ];
 
   // Stage 1 -> 2: Find & Parse Services
@@ -1003,15 +1058,28 @@ export default function Marketplace() {
           {/* STAGE 1: Describe Purchase */}
           {/* ============================================================== */}
           {!loading && stage === 1 && (
-            <div className="bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] p-6 shadow-xs space-y-5">
-              <div>
-                <h3 className="text-[18px] font-bold text-[#101828]">1. Describe Service to Procure</h3>
-                <p className="text-[14px] text-[#475467] mt-1">
-                  Enter your purchase intent in natural language. Gemini extracts structured constraints, and competing specialized agents will bid.
-                </p>
+            <div className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6 shadow-sm space-y-5 transition-all">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+                <div>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h3 className="text-[19px] font-bold text-[#0F172A] tracking-tight">1. Describe Service to Procure</h3>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[11.5px] font-semibold text-[#2563EB]">
+                      <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" /> AI Multi-Agent Reverse Auction
+                    </span>
+                  </div>
+                  <p className="text-[13.5px] text-[#475467] mt-1">
+                    Enter your procurement intent in natural language. Google Gemini extracts structured constraints and negotiates with verified seller agents under strict policy boundaries.
+                  </p>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-[11px] font-medium text-[#64748B] shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#15803D]" />
+                  <span>Deterministic Policy Active</span>
+                </div>
               </div>
 
-              <div className="relative">
+              {/* Enhanced Prompt Input Container with In-box Toolbar */}
+              <div className="relative rounded-xl border border-[#CBD5E1] bg-[#FFFFFF] shadow-2xs focus-within:border-[#2563EB] focus-within:ring-3 focus-within:ring-[#2563EB]/15 transition-all">
                 <textarea
                   value={taskInput}
                   onChange={(e) => setTaskInput(e.target.value)}
@@ -1024,48 +1092,111 @@ export default function Marketplace() {
                     }
                   }}
                   rows={4}
-                  placeholder="e.g. Create a 10-slide presentation for my SIH hackathon pitch, budget $400... (Press Enter to submit)"
-                  className="w-full rounded-xl border border-[#D0D5DD] p-4 text-[14px] text-[#101828] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] leading-relaxed resize-y"
+                  maxLength={500}
+                  placeholder="e.g. Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow, budget $850... (Press Enter to submit)"
+                  className="w-full bg-transparent p-4 pb-12 text-[14.5px] text-[#0F172A] placeholder-[#94A3B8] focus:outline-none leading-relaxed resize-y"
                 />
+
+                {/* In-box Actions Toolbar */}
+                <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between pointer-events-none">
+                  {/* Left: Quick mic & clear buttons */}
+                  <div className="flex items-center gap-2 pointer-events-auto">
+                    <button
+                      type="button"
+                      onClick={handleVoiceInput}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11.5px] font-semibold rounded-lg border transition-all cursor-pointer ${
+                        isListening
+                          ? 'bg-[#FEF2F2] border-[#FECACA] text-[#B42318] animate-pulse'
+                          : 'bg-[#F8FAFC] hover:bg-[#EFF6FF] border-[#E2E8F0] hover:border-[#BFDBFE] text-[#475467] hover:text-[#2563EB]'
+                      }`}
+                      title={isListening ? 'Click to stop listening' : 'Dictate with microphone'}
+                    >
+                      {isListening ? (
+                        <>
+                          <span className="w-2 h-2 rounded-full bg-[#B42318] animate-ping" />
+                          <span>Listening...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="w-3.5 h-3.5" />
+                          <span>Voice Prompt</span>
+                        </>
+                      )}
+                    </button>
+
+                    {taskInput.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => setTaskInput('')}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-[#64748B] hover:text-[#0F172A] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-md transition-colors cursor-pointer"
+                        title="Clear input"
+                      >
+                        <X className="w-3 h-3" />
+                        <span>Clear</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Right: Character Counter */}
+                  <div className="text-[11px] font-mono text-[#94A3B8] pointer-events-auto select-none">
+                    <span className={taskInput.length > 450 ? 'text-[#B45309] font-bold' : ''}>
+                      {taskInput.length}
+                    </span>
+                    <span> / 500</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Compact Suggested Prompt Chips */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[12px] font-semibold text-[#64748B] mr-1">Suggested:</span>
-                {exampleChips.map((chip, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setTaskInput(chip.prompt)}
-                    className="text-[12px] px-3 py-1 bg-[#F8FAFC] hover:bg-[#EFF6FF] hover:border-[#BFDBFE] hover:text-[#2563EB] border border-[#E2E8F0] text-[#344054] rounded-full transition-all font-medium active:scale-95 cursor-pointer shadow-2xs"
-                  >
-                    {chip.label}
-                  </button>
-                ))}
+              {/* Categorized Example Chips */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[12px]">
+                  <span className="font-semibold text-[#475467] flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
+                    <span>Quick-Start Templates:</span>
+                  </span>
+                  <span className="text-[11px] text-[#94A3B8]">Click to load instant benchmark scenario</span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {exampleChips.map((chip, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setTaskInput(chip.prompt)}
+                      className="group inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#EFF6FF] hover:border-[#93C5FD] border border-[#E2E8F0] text-[#334155] hover:text-[#1D4ED8] rounded-lg transition-all font-medium shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
+                    >
+                      <span className="text-[13px]">{chip.icon}</span>
+                      <span>{chip.label}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#94A3B8] group-hover:text-[#3B82F6] opacity-80">
+                        {chip.category}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Footer with Enter Shortcut & Submit Button */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#F1F5F9]">
                 <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
-                  <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0]">
+                  <kbd className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0] shadow-2xs">
                     Enter ↵
-                  </span>
+                  </kbd>
                   <span>to submit</span>
                   <span className="text-[#CBD5E1]">•</span>
-                  <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0]">
+                  <kbd className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0] shadow-2xs">
                     Shift + Enter
-                  </span>
+                  </kbd>
                   <span>for new line</span>
                 </div>
 
                 <button
                   onClick={() => handleFindServices()}
                   disabled={!taskInput.trim() || loading}
-                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-[14px] rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-7 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-40 text-white font-semibold text-[14px] rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-98"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Submit Request & Solicit Agent Bids</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span>Submit Request &amp; Solicit Agent Bids</span>
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
