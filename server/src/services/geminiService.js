@@ -100,6 +100,16 @@ User request: ${userInput}`;
     if (typeof parsed.maxBudget === 'string') {
       parsed.maxBudget = parseFloat(parsed.maxBudget.replace(/[^0-9.]/g, ''));
     }
+
+    // Safety check: if userInput explicitly specifies a budget (e.g. $850 or budget 850), ensure it is respected
+    const explicitBudgetMatch = userInput.match(/\$\s*(\d+(?:,\d{3})*(?:\.\d{2})?)/) || userInput.match(/budget\s*(?:of|is|:)?\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
+    if (explicitBudgetMatch) {
+      const explicitVal = parseFloat((explicitBudgetMatch[1] || explicitBudgetMatch[2]).replace(/,/g, ''));
+      if (explicitVal > 0 && (!parsed.maxBudget || parsed.maxBudget <= 10 || Math.abs(parsed.maxBudget - explicitVal) > 50)) {
+        parsed.maxBudget = explicitVal;
+      }
+    }
+
     if (typeof parsed.maxBudget !== 'number' || isNaN(parsed.maxBudget) || parsed.maxBudget <= 0) {
       throw new Error(`Invalid maxBudget: ${parsed.maxBudget}`);
     }
@@ -125,25 +135,25 @@ function fallbackParseTask(userInput) {
   const input = userInput.toLowerCase();
   let serviceType = 'content';
 
-  if (input.includes('presentation') || input.includes('slide') || input.includes('pitch')) {
+  if (input.includes('presentation') || input.includes('slide') || input.includes('pitch') || input.includes('deck')) {
     serviceType = 'presentation';
-  } else if (input.includes('research') || input.includes('competitor') || input.includes('analysis')) {
-    serviceType = 'research';
-  } else if (input.includes('website') || input.includes('landing page') || input.includes('web')) {
+  } else if (input.includes('microservice') || input.includes('website') || input.includes('landing page') || input.includes('web') || input.includes('architect') || input.includes('backend') || input.includes('api') || input.includes('app')) {
     serviceType = 'website';
-  } else if (input.includes('design') || input.includes('logo') || input.includes('brand')) {
+  } else if (input.includes('research') || input.includes('competitor') || input.includes('analysis') || input.includes('audit') || input.includes('security') || input.includes('compliance')) {
+    serviceType = 'research';
+  } else if (input.includes('design') || input.includes('logo') || input.includes('brand') || input.includes('ui') || input.includes('ux')) {
     serviceType = 'design';
   }
 
-  const budgetMatch = userInput.match(/\$\s*(\d+(?:,\d{3})*(?:\.\d{2})?)/);
-  const maxBudget = budgetMatch ? parseFloat(budgetMatch[1].replace(/,/g, '')) : 500;
+  const budgetMatch = userInput.match(/\$\s*(\d+(?:,\d{3})*(?:\.\d{2})?)/) || userInput.match(/budget\s*(?:of|is|:)?\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
+  const maxBudget = budgetMatch ? parseFloat((budgetMatch[1] || budgetMatch[2]).replace(/,/g, '')) : 500;
 
   const requirementMap = {
-    presentation: ['Professional slide deck design', 'Clear content organization', 'Visual consistency and branding'],
-    research: ['Comprehensive market analysis', 'Data-driven insights', 'Actionable recommendations'],
-    website: ['Responsive design implementation', 'SEO-optimized content', 'Modern user interface'],
-    content: ['Engaging written content', 'Target audience alignment', 'Brand voice consistency'],
-    design: ['Creative visual design', 'Brand identity elements', 'High-resolution deliverables']
+    presentation: ['10-slide standard pitch structure', 'Problem-solution-impact storytelling', 'Visual branding & speaker delivery notes'],
+    research: ['Comprehensive competitor SWOT benchmarking', 'Zero-Trust security & policy compliance audit', 'Actionable tabular intelligence dossier'],
+    website: ['High-concurrency microservice architecture', 'PayPal Orders v2 escrow checkout integration', 'Tamper-evident SHA-256 audit ledger'],
+    content: ['Engaging written technical documentation', 'Target audience alignment & positioning', 'Brand voice consistency & developer guides'],
+    design: ['Creative visual component design system', 'Brand identity elements & Figma tokens', 'WCAG 2.1 accessible high-resolution exports']
   };
 
   return {
@@ -152,7 +162,7 @@ function fallbackParseTask(userInput) {
       requirements: requirementMap[serviceType],
       maxBudget,
       urgency: 'normal',
-      reasoning: `Fallback parser: detected "${serviceType}" service type from keywords in the request.`
+      reasoning: `Deterministic parser: extracted "${serviceType}" service category with budget $${maxBudget} based on request parameters.`
     },
     source: 'fallback'
   };
