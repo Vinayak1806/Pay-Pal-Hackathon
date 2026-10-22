@@ -212,12 +212,12 @@ export default function Marketplace() {
   }, []);
 
   const exampleChips = [
-    'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400',
-    'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850',
-    'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450',
-    'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650',
-    'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300',
-    'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500'
+    { label: 'Pitch Deck ($400)', prompt: 'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400' },
+    { label: 'FinTech Microservice ($850)', prompt: 'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850' },
+    { label: 'Security Audit ($450)', prompt: 'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450' },
+    { label: 'RAG Pipeline ($650)', prompt: 'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650' },
+    { label: 'Competitor Analysis ($300)', prompt: 'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300' },
+    { label: 'SaaS Landing Page ($500)', prompt: 'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500' }
   ];
 
   // Stage 1 -> 2: Find & Parse Services
@@ -1011,96 +1011,57 @@ export default function Marketplace() {
                 </p>
               </div>
 
-              <textarea
-                value={taskInput}
-                onChange={(e) => setTaskInput(e.target.value)}
-                rows={4}
-                placeholder="e.g. Create a 10-slide presentation for my SIH hackathon pitch, budget $400..."
-                className="w-full rounded-xl border border-[#D0D5DD] p-4 text-[14px] text-[#101828] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] leading-relaxed"
-              />
-
-              <div className="space-y-2">
-                <span className="text-[12px] font-bold text-[#475467] uppercase tracking-wider block">
-                  Suggested Scenarios:
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {exampleChips.map((chip, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setTaskInput(chip)}
-                      className="text-[13px] px-3.5 py-2 bg-[#F8FAFC] hover:bg-[#EFF4FF] hover:border-[#BFDBFE] hover:text-[#2563EB] border border-[#D0D5DD] text-[#344054] rounded-lg text-left transition-colors font-medium shadow-2xs"
-                    >
-                      "{chip}"
-                    </button>
-                  ))}
-                </div>
+              <div className="relative">
+                <textarea
+                  value={taskInput}
+                  onChange={(e) => setTaskInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (taskInput.trim() && !loading) {
+                        handleFindServices();
+                      }
+                    }
+                  }}
+                  rows={4}
+                  placeholder="e.g. Create a 10-slide presentation for my SIH hackathon pitch, budget $400... (Press Enter to submit)"
+                  className="w-full rounded-xl border border-[#D0D5DD] p-4 text-[14px] text-[#101828] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] leading-relaxed resize-y"
+                />
               </div>
 
-              {/* Quick Access to Recent Past Requests */}
-              {requestHistory.length > 0 && (
-                <div className="pt-4 border-t border-[#F1F5F9] space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-bold text-[#475467] uppercase tracking-wider flex items-center gap-1.5">
-                      <History className="w-3.5 h-3.5 text-[#2563EB]" />
-                      Recent Requests:
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('history')}
-                      className="text-[12px] font-semibold text-[#2563EB] hover:underline"
-                    >
-                      View All ({requestHistory.length}) &rarr;
-                    </button>
-                  </div>
+              {/* Compact Suggested Prompt Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[12px] font-semibold text-[#64748B] mr-1">Suggested:</span>
+                {exampleChips.map((chip, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setTaskInput(chip.prompt)}
+                    className="text-[12px] px-3 py-1 bg-[#F8FAFC] hover:bg-[#EFF6FF] hover:border-[#BFDBFE] hover:text-[#2563EB] border border-[#E2E8F0] text-[#344054] rounded-full transition-all font-medium active:scale-95 cursor-pointer shadow-2xs"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                    {requestHistory.slice(0, 3).map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg hover:border-[#BFDBFE] transition-colors flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[11px] font-bold text-[#2563EB] uppercase">
-                              {item.serviceType}
-                            </span>
-                            <span className="text-[11px] font-bold text-[#15803D]">
-                              ${item.budget || 0}
-                            </span>
-                          </div>
-                          <p className="text-[12px] text-[#344054] line-clamp-2 leading-snug">
-                            {item.prompt || item.description}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-[#E2E8F0]/60">
-                          <button
-                            type="button"
-                            onClick={() => handleRerunFromHistory(item, false)}
-                            className="text-[11px] font-semibold text-[#2563EB] hover:underline"
-                          >
-                            Load Prompt
-                          </button>
-                          <span className="text-[#CBD5E1]">&bull;</span>
-                          <button
-                            type="button"
-                            onClick={() => handleLoadAndCustomize(item)}
-                            className="text-[11px] font-semibold text-[#475467] hover:text-[#101828]"
-                          >
-                            Customize Scope
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              {/* Footer with Enter Shortcut & Submit Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#F1F5F9]">
+                <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+                  <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0]">
+                    Enter ↵
+                  </span>
+                  <span>to submit</span>
+                  <span className="text-[#CBD5E1]">•</span>
+                  <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0]">
+                    Shift + Enter
+                  </span>
+                  <span>for new line</span>
                 </div>
-              )}
 
-              <div className="flex justify-end pt-2">
                 <button
                   onClick={() => handleFindServices()}
-                  disabled={!taskInput.trim()}
-                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-[14px] rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                  disabled={!taskInput.trim() || loading}
+                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-[14px] rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>Submit Request & Solicit Agent Bids</span>
