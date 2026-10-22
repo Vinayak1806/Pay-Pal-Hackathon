@@ -267,12 +267,12 @@ export default function Marketplace() {
   }, []);
 
   const exampleChips = [
-    { icon: '📊', label: 'Pitch Deck ($400)', category: 'Presentation', prompt: 'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400' },
-    { icon: '⚡', label: 'FinTech Microservice ($850)', category: 'Engineering', prompt: 'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850' },
-    { icon: '🛡️', label: 'Security Audit ($450)', category: 'Security', prompt: 'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450' },
-    { icon: '🧠', label: 'RAG Pipeline ($650)', category: 'AI Architecture', prompt: 'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650' },
-    { icon: '🔍', label: 'Competitor Analysis ($300)', category: 'Research', prompt: 'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300' },
-    { icon: '💻', label: 'SaaS Landing Page ($500)', category: 'Web Design', prompt: 'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500' }
+    { label: 'Pitch Deck ($400)', category: 'Presentation', prompt: 'Create an institutional Series A investor pitch deck with TAM modeling and unit economics, budget $400' },
+    { label: 'FinTech Microservice ($850)', category: 'Engineering', prompt: 'Architect a high-concurrency FinTech payment microservice with PayPal Orders v2 escrow and SHA-256 audit ledger, budget $850' },
+    { label: 'Security Audit ($450)', category: 'Security', prompt: 'Conduct an automated zero-trust security audit and penetration test on our agent procurement API, budget $450' },
+    { label: 'RAG Pipeline ($650)', category: 'AI Architecture', prompt: 'Engineer an enterprise RAG knowledge pipeline with semantic vector search, caching, and SLA benchmarking, budget $650' },
+    { label: 'Competitor Analysis ($300)', category: 'Research', prompt: 'Research the top 5 EdTech competitors with SWOT framework, market sizing, and pricing models, budget $300' },
+    { label: 'SaaS Landing Page ($500)', category: 'Web Design', prompt: 'Develop a responsive SaaS landing page with dark-mode analytics dashboard and PayPal checkout, budget $500' }
   ];
 
   // Stage 1 -> 2: Find & Parse Services
@@ -1163,9 +1163,8 @@ export default function Marketplace() {
                       key={idx}
                       type="button"
                       onClick={() => setTaskInput(chip.prompt)}
-                      className="group inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#EFF6FF] hover:border-[#93C5FD] border border-[#E2E8F0] text-[#334155] hover:text-[#1D4ED8] rounded-lg transition-all font-medium shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
+                      className="group inline-flex items-center gap-2 text-[12px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#EFF6FF] hover:border-[#93C5FD] border border-[#E2E8F0] text-[#334155] hover:text-[#1D4ED8] rounded-lg transition-all font-medium shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
                     >
-                      <span className="text-[13px]">{chip.icon}</span>
                       <span>{chip.label}</span>
                       <span className="text-[10px] uppercase font-bold text-[#94A3B8] group-hover:text-[#3B82F6] opacity-80">
                         {chip.category}
@@ -1175,20 +1174,8 @@ export default function Marketplace() {
                 </div>
               </div>
 
-              {/* Footer with Enter Shortcut & Submit Button */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#F1F5F9]">
-                <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
-                  <kbd className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0] shadow-2xs">
-                    Enter ↵
-                  </kbd>
-                  <span>to submit</span>
-                  <span className="text-[#CBD5E1]">•</span>
-                  <kbd className="px-1.5 py-0.5 rounded bg-[#F1F5F9] font-mono text-[11px] text-[#334155] font-semibold border border-[#E2E8F0] shadow-2xs">
-                    Shift + Enter
-                  </kbd>
-                  <span>for new line</span>
-                </div>
-
+              {/* Footer with Submit Button */}
+              <div className="flex justify-end pt-3 border-t border-[#F1F5F9]">
                 <button
                   onClick={() => handleFindServices()}
                   disabled={!taskInput.trim() || loading}
