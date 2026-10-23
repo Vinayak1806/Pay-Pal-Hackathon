@@ -49,10 +49,14 @@ export const narrationScripts = {
     `Redirecting to PayPal Sandbox checkout.`,
 
   CAPTURE_VERIFIED: ({ amount } = {}) =>
-    `PayPal payment of $${amount || ''} captured and verified.`,
+    amount
+      ? `PayPal payment of $${parseFloat(amount).toFixed(2)} captured and verified successfully. Your deliverable is ready.`
+      : `PayPal payment captured and verified successfully. Your deliverable is ready.`,
 
-  CAPTURE_FAILED: () =>
-    `Payment capture failed. No funds were deducted.`,
+  CAPTURE_FAILED: ({ reason } = {}) =>
+    reason
+      ? `Payment was not completed: ${reason}`
+      : `Payment capture was not completed. No funds were deducted.`,
 
   TAMPER_BLOCKED: ({ storedAmount } = {}) =>
     `Tamper blocked! Enforcing original price of $${storedAmount || ''}.`,
@@ -120,12 +124,32 @@ export const answerScripts = {
   WHY_CHECKOUT_BLOCKED: ({ deal } = {}) =>
     `Blocked by policy: ${deal?.blockedReason || 'Violated spending policy'}. Check audit log for details.`,
 
-  WAS_PAYMENT_CAPTURED: ({ captureData } = {}) => {
-    if (!captureData) return `No payment initiated yet.`;
-    if (captureData.captureStatus === 'COMPLETED') {
-      return `Yes, $${captureData.amount || ''} was settled and verified in PayPal Sandbox.`;
+  WAS_PAYMENT_CAPTURED: ({ captureData, currentPath, lastEvent } = {}) => {
+    // 1. If currently on payment confirmation page
+    if (currentPath?.includes('/payment/success')) {
+      const amt = captureData?.amount ?? lastEvent?.amount;
+      return amt
+        ? `Yes, your PayPal payment of $${parseFloat(amt).toFixed(2)} USD is confirmed and settled. Your deliverable is ready.`
+        : `Yes, your PayPal payment has been captured and verified successfully. Your deliverable is ready.`;
     }
-    return `Capture status is ${captureData.captureStatus || 'pending'}.`;
+    // 2. If currently on payment cancel page
+    if (currentPath?.includes('/payment/cancel')) {
+      return `No, PayPal checkout was cancelled by user. No funds were debited from your account.`;
+    }
+    // 3. From verified capture data or event
+    if (captureData?.captureStatus === 'COMPLETED' || lastEvent?.type === 'CAPTURE_VERIFIED') {
+      const amt = captureData?.amount ?? lastEvent?.amount;
+      return amt
+        ? `Yes, your PayPal payment of $${parseFloat(amt).toFixed(2)} USD was settled and verified in PayPal Sandbox.`
+        : `Yes, your PayPal payment was captured and verified successfully.`;
+    }
+    if (captureData?.captureStatus === 'FAILED' || lastEvent?.type === 'CAPTURE_FAILED') {
+      return `No, payment capture was not completed: ${lastEvent?.reason || captureData?.reason || 'cancelled or failed'}.`;
+    }
+    if (captureData?.captureStatus) {
+      return `Payment capture status is currently ${captureData.captureStatus}.`;
+    }
+    return `No payment has been initiated yet. You can submit a purchase request to begin.`;
   },
 
   HOW_SPENDMESH_PROTECTS: () =>

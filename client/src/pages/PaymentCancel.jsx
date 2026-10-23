@@ -1,13 +1,27 @@
 import React, { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { paymentService } from '../services/api';
-import { XCircle, ArrowLeft } from 'lucide-react';
+import { XCircle, ArrowLeft, Volume2 } from 'lucide-react';
+import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
+import { useVoiceContext } from '../context/VoiceContext';
 
 export default function PaymentCancel() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { updateVoiceContext } = useVoiceContext();
 
   useEffect(() => {
+    updateVoiceContext({
+      lastEvent: {
+        type: VoiceEvents.CAPTURE_FAILED,
+        reason: 'PayPal checkout was cancelled by user. No funds were debited.'
+      }
+    });
+
+    voiceEventBus.emit(VoiceEvents.CAPTURE_FAILED, {
+      reason: 'PayPal checkout was cancelled by user. No funds were debited.',
+    }, { force: true });
+
     if (token) {
       paymentService.handleCancelStatus(token).catch((err) => {
         console.error('Failed to notify cancel status:', err);
@@ -35,6 +49,19 @@ export default function PaymentCancel() {
       )}
 
       <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={() => {
+            voiceEventBus.emit(VoiceEvents.CAPTURE_FAILED, {
+              reason: 'PayPal checkout was cancelled by user. No funds were debited.',
+            }, { force: true });
+          }}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B] font-medium text-[13px] rounded-lg border border-[#CBD5E1] shadow-2xs transition-all active:scale-95"
+          title="Play voice cancellation notice"
+        >
+          <Volume2 className="w-4 h-4 text-[#B42318]" />
+          <span>Hear Voice Notice</span>
+        </button>
+
         <Link
           to="/requests"
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[13px] rounded-lg shadow-xs transition-colors"

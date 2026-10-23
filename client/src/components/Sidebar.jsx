@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -19,7 +19,6 @@ import toast from 'react-hot-toast';
 import Logo from './Logo';
 
 export default function Sidebar({ isOpen, onClose }) {
-  const navigate = useNavigate();
   const [approvalsCount, setApprovalsCount] = useState({ pending: 0, approvedUnpaid: 0 });
   const [policy, setPolicy] = useState(null);
   const [resetting, setResetting] = useState(false);

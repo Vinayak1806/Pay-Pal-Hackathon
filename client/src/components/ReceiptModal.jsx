@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Printer, CheckCircle, Copy, Award, Check, FileText, Download, Loader2 } from 'lucide-react';
+import { X, ShieldCheck, Printer, Copy, Check, Download, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { printReceiptDocument, downloadReceiptPdf } from '../utils/printReceipt';
 import { LogoIcon } from './Logo';

@@ -20,8 +20,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Mic, MicOff, Volume2, VolumeX, StopCircle,
-  MessageCircle, X, ChevronUp, ChevronDown,
-  RotateCcw, Send, Wifi, WifiOff, Shield
+  X, RotateCcw, Send, Shield
 } from 'lucide-react';
 import { useVoice } from './useVoice';
 import { processCommand } from './voiceCommands';
@@ -32,8 +31,7 @@ import { agentService } from '../services/api';
 import {
   playSuccessChime,
   playAlertChime,
-  playShieldBlockedChime,
-  playAssistantOpenChime
+  playShieldBlockedChime
 } from '../utils/audioChimes';
 
 // ─── Conversation Message Types ────────────────────────────────
@@ -125,6 +123,7 @@ export default function VoiceAssistant() {
   const textInputRef = useRef(null);
   const welcomeSpokenRef = useRef(false);
   const isFirstOpenRef = useRef(true);
+  const lastEventRef = useRef(null);
 
   // Auto-scroll transcript
   const scrollToBottom = useCallback(() => {
@@ -153,6 +152,7 @@ export default function VoiceAssistant() {
     const result = processCommand(input, {
       navigate,
       currentPath: location.pathname,
+      lastEvent: lastEventRef.current,
       ...voiceAppContext,
     });
 
@@ -334,6 +334,7 @@ export default function VoiceAssistant() {
 
     const subscribe = (eventType, scriptFn, priority = 0) => {
       const handler = (event) => {
+        lastEventRef.current = event;
         const eventKey = `${eventType}-${event.timestamp}`;
         // Skip if we already announced this exact event
         setLastAnnouncedEvents(prev => {
@@ -359,7 +360,8 @@ export default function VoiceAssistant() {
         } else if (
           eventType === VoiceEvents.POLICY_BLOCKED ||
           eventType === VoiceEvents.TAMPER_BLOCKED ||
-          eventType === VoiceEvents.DUPLICATE_BLOCKED
+          eventType === VoiceEvents.DUPLICATE_BLOCKED ||
+          eventType === VoiceEvents.CAPTURE_FAILED
         ) {
           playShieldBlockedChime();
         }
@@ -382,6 +384,7 @@ export default function VoiceAssistant() {
     subscribe(VoiceEvents.APPROVAL_GRANTED,   narrationScripts.APPROVAL_GRANTED,   1);
     subscribe(VoiceEvents.APPROVAL_REJECTED,  narrationScripts.APPROVAL_REJECTED,  1);
     subscribe(VoiceEvents.CHECKOUT_READY,     narrationScripts.CHECKOUT_READY,     0);
+    subscribe(VoiceEvents.CHECKOUT_INITIATED, narrationScripts.CHECKOUT_INITIATED, 1);
     subscribe(VoiceEvents.CAPTURE_VERIFIED,   narrationScripts.CAPTURE_VERIFIED,   1);
     subscribe(VoiceEvents.CAPTURE_FAILED,     narrationScripts.CAPTURE_FAILED,     1);
     subscribe(VoiceEvents.LEDGER_VERIFIED,    narrationScripts.LEDGER_VERIFIED,    0);

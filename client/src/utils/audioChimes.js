@@ -21,6 +21,17 @@ function getAudioContext() {
   return audioCtx;
 }
 
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  };
+  window.addEventListener('click', unlockAudio, { passive: true });
+  window.addEventListener('pointerdown', unlockAudio, { passive: true });
+  window.addEventListener('keydown', unlockAudio, { passive: true });
+}
+
 /**
  * 🟢 Success Chime: Ascending major triad (C5 -> E5 -> G5)
  * Triggered on PayPal payment captured and authorized approvals.

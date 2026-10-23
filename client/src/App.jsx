@@ -39,7 +39,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <VoiceProvider>
         <RouteWatcher />
         <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex">

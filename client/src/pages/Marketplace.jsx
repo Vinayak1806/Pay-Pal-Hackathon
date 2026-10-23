@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-  Send,
-  Star,
   Check,
-  CheckCircle,
   AlertTriangle,
   XCircle,
   Clock,
@@ -13,8 +10,6 @@ import {
   ChevronDown,
   ChevronUp,
   ShieldCheck,
-  RefreshCw,
-  ExternalLink,
   ArrowRight,
   ArrowLeft,
   History,
@@ -23,18 +18,12 @@ import {
   Trash2,
   Save,
   RotateCcw,
-  FileText,
-  Layers,
-  Search,
   Sparkles,
-  Copy,
   Mic,
-  MicOff,
   X
 } from 'lucide-react';
 import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
-import StatusBadge from '../components/StatusBadge';
 import toast from 'react-hot-toast';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
 import { useVoiceContext } from '../context/VoiceContext';
@@ -48,7 +37,6 @@ const SERVICE_CATEGORIES = [
 ];
 
 export default function Marketplace() {
-  const navigate = useNavigate();
   const { updateVoiceContext } = useVoiceContext();
 
   // Active top tab: 'workflow' | 'history'

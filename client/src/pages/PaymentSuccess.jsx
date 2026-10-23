@@ -5,29 +5,27 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import {
   CheckCircle,
   AlertTriangle,
-  FileText,
-  ArrowRight,
-  ShieldCheck,
   Copy,
   Check,
+  FileText,
   Printer,
   Download,
   Loader2,
-  Sparkles,
-  Lightbulb,
   CheckCircle2,
   Eye,
   Code2,
-  Layers
+  Layers,
+  Volume2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReceiptModal from '../components/ReceiptModal';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
 import { printReceiptDocument, downloadReceiptPdf } from '../utils/printReceipt';
+import { useVoiceContext } from '../context/VoiceContext';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { updateVoiceContext } = useVoiceContext();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,6 +40,9 @@ export default function PaymentSuccess() {
     if (!token) {
       setError('No payment token found in return URL. Return to purchase requests.');
       setLoading(false);
+      voiceEventBus.emit(VoiceEvents.CAPTURE_FAILED, {
+        reason: 'No payment token found in return URL',
+      }, { force: true });
       return;
     }
 
@@ -50,9 +51,19 @@ export default function PaymentSuccess() {
         const res = await paymentService.capturePayment(token);
         if (res.data?.captureStatus === 'COMPLETED' || res.data?.dealStatus === 'payment_completed') {
           setCaptureData(res.data);
+          const finalAmount = res.data.amount ?? res.data.totalAmount;
+          // Sync with voice assistant context
+          updateVoiceContext({
+            captureData: res.data,
+            lastEvent: {
+              type: VoiceEvents.CAPTURE_VERIFIED,
+              amount: finalAmount,
+              captureId: res.data.captureId
+            }
+          });
           // Emit verified capture — drives voice narration based on real backend result
           voiceEventBus.emit(VoiceEvents.CAPTURE_VERIFIED, {
-            amount: res.data.amount,
+            amount: finalAmount,
             captureId: res.data.captureId,
           }, { force: true });
         } else {
@@ -66,7 +77,7 @@ export default function PaymentSuccess() {
           const dealsRes = await dealService.getDeals();
           const matchingDeal = (dealsRes.data?.deals || []).find(d => d.paypalOrderId === token);
           if (matchingDeal) {
-            setCaptureData({
+            const dealCaptureData = {
               captureStatus: 'COMPLETED',
               captureId: matchingDeal.paypalCaptureId || matchingDeal.paypalOrderId,
               amount: matchingDeal.agreedAmount,
@@ -74,7 +85,20 @@ export default function PaymentSuccess() {
               deliverable: matchingDeal.deliverable,
               serviceType: matchingDeal.serviceType,
               sellerAgent: matchingDeal.sellerAgent
+            };
+            setCaptureData(dealCaptureData);
+            updateVoiceContext({
+              captureData: dealCaptureData,
+              lastEvent: {
+                type: VoiceEvents.CAPTURE_VERIFIED,
+                amount: matchingDeal.agreedAmount,
+                captureId: matchingDeal.paypalCaptureId || matchingDeal.paypalOrderId
+              }
             });
+            voiceEventBus.emit(VoiceEvents.CAPTURE_VERIFIED, {
+              amount: matchingDeal.agreedAmount,
+              captureId: matchingDeal.paypalCaptureId || matchingDeal.paypalOrderId,
+            }, { force: true });
             return;
           }
         } catch (fetchErr) {
@@ -84,8 +108,14 @@ export default function PaymentSuccess() {
         if (err.code === 'DUPLICATE_CAPTURE' || err.status === 409) {
           setDuplicate(true);
           setCaptureData(err.data || {});
+          voiceEventBus.emit(VoiceEvents.DUPLICATE_BLOCKED, {
+            reason: 'Replay attack prevented. Duplicate payment rejected.',
+          }, { force: true });
         } else {
           setError(err.message || 'Failed to capture PayPal payment');
+          voiceEventBus.emit(VoiceEvents.CAPTURE_FAILED, {
+            reason: err.message || 'Payment capture failed',
+          }, { force: true });
         }
       } finally {
         setLoading(false);
@@ -192,6 +222,20 @@ export default function PaymentSuccess() {
 
           {/* Quick Header Actions */}
           <div className="flex items-center gap-2 self-start sm:self-center">
+            <button
+              onClick={() => {
+                voiceEventBus.emit(VoiceEvents.CAPTURE_VERIFIED, {
+                  amount: captureData?.amount,
+                  captureId: captureData?.captureId,
+                }, { force: true });
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B] font-semibold text-[12px] rounded-lg border border-[#CBD5E1] shadow-2xs transition-all active:scale-95"
+              title="Hear voice security verification"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span>Voice Verification</span>
+            </button>
+
             <button
               onClick={() => {
                 printReceiptDocument({

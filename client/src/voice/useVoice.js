@@ -47,6 +47,8 @@ export function useVoice() {
   const isProcessingQueueRef = useRef(false);
   const onResultRef = useRef(null); // callback for recognized speech
   const lastSpokenRef = useRef(''); // for repeat command
+  const pendingSpeechRef = useRef(null); // { text, options } for autoplay recovery on user gesture
+  const hasStartedSpeakingRef = useRef(false);
 
   // ── Cleanup on unmount ──────────────────────────────────────────
   useEffect(() => {
@@ -112,6 +114,7 @@ export function useVoice() {
     setIsSpeaking(true);
     setLastSpoken(text);
     lastSpokenRef.current = text;
+    hasStartedSpeakingRef.current = false;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.12; // Crisp, responsive, natural assistant rate (15% faster)
@@ -122,11 +125,17 @@ export function useVoice() {
     const preferredVoice = getBestVoice();
     if (preferredVoice) utterance.voice = preferredVoice;
 
+    let watchdogTimer = null;
+
     utterance.onstart = () => {
+      hasStartedSpeakingRef.current = true;
+      pendingSpeechRef.current = null;
+      if (watchdogTimer) clearTimeout(watchdogTimer);
       setIsSpeaking(true);
     };
 
     utterance.onend = () => {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       utteranceRef.current = null;
@@ -135,11 +144,29 @@ export function useVoice() {
     };
 
     utterance.onerror = (e) => {
+      if (watchdogTimer) clearTimeout(watchdogTimer);
+      // If blocked by browser autoplay policy, keep in pendingSpeechRef for user gesture
+      if (e?.error === 'not-allowed') {
+        hasStartedSpeakingRef.current = false;
+      } else {
+        pendingSpeechRef.current = null;
+      }
       isProcessingQueueRef.current = false;
       setIsSpeaking(false);
       utteranceRef.current = null;
       setTimeout(_processQueue, 10);
     };
+
+    // Watchdog: If browser pauses or drops speech without firing callbacks (e.g. autoplay restriction), unstick queue
+    watchdogTimer = setTimeout(() => {
+      if (!hasStartedSpeakingRef.current && isProcessingQueueRef.current) {
+        try {
+          window.speechSynthesis.resume();
+        } catch (e) {}
+        isProcessingQueueRef.current = false;
+        setIsSpeaking(false);
+      }
+    }, 1200);
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
@@ -175,6 +202,8 @@ export function useVoice() {
     }
 
     const { priority = 0, interruptCurrent = true } = options;
+    pendingSpeechRef.current = { text, options: { priority, interruptCurrent } };
+    hasStartedSpeakingRef.current = false;
 
     // Immediately wake up the speech engine
     try {
@@ -202,6 +231,36 @@ export function useVoice() {
 
     _processQueue();
   }, [isMuted, _processQueue]);
+
+  // ── Global User Interaction Listener (Autoplay Recovery) ───────
+  // Modern browsers block speech/audio autoplay upon cross-origin redirects (e.g. from PayPal).
+  // This listener resumes speech synthesis on the very first user interaction (click/touch/key)
+  // and speaks any pending speech that was delayed by browser autoplay policy.
+  useEffect(() => {
+    if (!hasSpeechSynthesis) return;
+
+    const handleUserInteraction = () => {
+      try {
+        window.speechSynthesis.resume();
+      } catch (e) {}
+
+      if (pendingSpeechRef.current && !hasStartedSpeakingRef.current) {
+        const pending = pendingSpeechRef.current;
+        pendingSpeechRef.current = null;
+        speak(pending.text, { ...pending.options, interruptCurrent: false });
+      }
+    };
+
+    window.addEventListener('click', handleUserInteraction, { passive: true });
+    window.addEventListener('pointerdown', handleUserInteraction, { passive: true });
+    window.addEventListener('keydown', handleUserInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('pointerdown', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, [hasSpeechSynthesis, speak]);
 
   // ── Public: stop speaking ───────────────────────────────────────
   const stopSpeaking = useCallback(() => {

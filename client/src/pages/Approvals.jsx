@@ -7,12 +7,9 @@ import {
   X,
   Clock,
   ShieldCheck,
-  RefreshCw,
   AlertCircle,
   ArrowRight,
-  ExternalLink,
   CreditCard,
-  Lock,
   Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';

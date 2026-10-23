@@ -10,7 +10,6 @@ import {
   RotateCcw,
   Copy,
   Check,
-  FileText,
   ShieldCheck,
   Loader2
 } from 'lucide-react';

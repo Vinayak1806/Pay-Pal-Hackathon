@@ -185,13 +185,33 @@ export function processCommand(rawInput, context = {}) {
     return { response: answerScripts.WHY_CHECKOUT_BLOCKED({ deal: currentDeal }), navigated: false };
   }
 
-  // ── 9. Was payment captured ─────────────────────────────────────
+  // ── 9. Was payment captured / is payment done ───────────────────
   if (
-    normalized.includes('payment') && (normalized.includes('captured') || normalized.includes('verified') || normalized.includes('completed')) ||
-    normalized.includes('was the payment') ||
-    normalized.includes('payment status')
+    normalized.includes('payment') ||
+    normalized.includes('paid') ||
+    normalized.includes('checkout') ||
+    normalized.includes('transaction')
   ) {
-    return { response: answerScripts.WAS_PAYMENT_CAPTURED({ captureData }), navigated: false };
+    if (
+      normalized.includes('done') ||
+      normalized.includes('complete') ||
+      normalized.includes('captured') ||
+      normalized.includes('verified') ||
+      normalized.includes('settled') ||
+      normalized.includes('status') ||
+      normalized.includes('succeed') ||
+      normalized.includes('success') ||
+      normalized.includes('through') ||
+      normalized.includes('finish') ||
+      normalized.includes('paid') ||
+      normalized.includes('confirm') ||
+      normalized.includes('was the payment') ||
+      normalized.includes('is the payment') ||
+      normalized.includes('did the payment') ||
+      normalized.includes('has the payment')
+    ) {
+      return { response: answerScripts.WAS_PAYMENT_CAPTURED({ captureData, currentPath, lastEvent }), navigated: false };
+    }
   }
 
   // ── 10. How SpendMesh protects ──────────────────────────────────

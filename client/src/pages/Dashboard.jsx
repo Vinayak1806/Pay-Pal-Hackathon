@@ -7,13 +7,9 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import {
   RotateCcw,
   Search,
-  ExternalLink,
   ShieldCheck,
   CheckCircle,
   Clock,
-  CreditCard,
-  X,
-  FileCode,
   Download,
   ChevronLeft,
   ChevronRight,

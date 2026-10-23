@@ -16,13 +16,13 @@ export function LogoIcon({ size = 32, className = '' }) {
     >
       <defs>
         <linearGradient id="shieldGradIcon" x1="6" y1="3" x2="42" y2="45" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#3B82F6" />
-          <stop offset="60%" stop-color="#2563EB" />
-          <stop offset="100%" stop-color="#1D4ED8" />
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="60%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1D4ED8" />
         </linearGradient>
         <linearGradient id="meshGradIcon" x1="12" y1="10" x2="36" y2="38" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#67E8F9" />
-          <stop offset="100%" stop-color="#FFFFFF" />
+          <stop offset="0%" stopColor="#67E8F9" />
+          <stop offset="100%" stopColor="#FFFFFF" />
         </linearGradient>
       </defs>
 

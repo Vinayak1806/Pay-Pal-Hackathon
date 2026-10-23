@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, CheckCircle, ShieldCheck, ArrowRight, Activity, Zap } from 'lucide-react';
+import { Bot, CheckCircle, ShieldCheck, ArrowRight, Activity } from 'lucide-react';
 
 export const REGISTERED_AGENTS = [
     {

@@ -8,15 +8,12 @@ import {
   ArrowRight,
   Plus,
   CheckCircle,
-  ExternalLink,
   ChevronRight,
   TrendingUp,
   ShieldCheck,
   Shield,
   Lock,
-  Check,
-  Activity,
-  FileCheck
+  Activity
 } from 'lucide-react';
 import { dealService, policyService, auditService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
