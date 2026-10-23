@@ -11,7 +11,8 @@ import {
   Copy,
   Check,
   ShieldCheck,
-  Loader2
+  Loader2,
+  FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { voiceEventBus, VoiceEvents } from '../voice/voiceEventBus';

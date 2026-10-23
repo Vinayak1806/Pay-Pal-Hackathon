@@ -14,25 +14,25 @@ import { answerScripts } from './voiceScripts';
 
 // Navigation path mapping
 const NAVIGATION_MAP = {
-  'dashboard':        '/',
-  'overview':         '/',
-  'home':             '/',
+  'dashboard': '/',
+  'overview': '/',
+  'home': '/',
   'purchase requests': '/requests',
-  'purchase':         '/requests',
-  'requests':         '/requests',
-  'marketplace':      '/marketplace',
+  'purchase': '/requests',
+  'requests': '/requests',
+  'marketplace': '/marketplace',
   'agent marketplace': '/agents',
-  'agents':           '/agents',
-  'transactions':     '/transactions',
+  'agents': '/agents',
+  'transactions': '/transactions',
   'transaction ledger': '/transactions',
-  'policy':           '/policy',
-  'policy center':    '/policy',
-  'audit':            '/audit',
-  'audit log':        '/audit',
-  'audit logs':       '/audit',
-  'approvals':        '/approvals',
-  'approval center':  '/approvals',
-  'approval queue':   '/approvals',
+  'policy': '/policy',
+  'policy center': '/policy',
+  'audit': '/audit',
+  'audit log': '/audit',
+  'audit logs': '/audit',
+  'approvals': '/approvals',
+  'approval center': '/approvals',
+  'approval queue': '/approvals',
 };
 
 /**
@@ -112,6 +112,46 @@ export function processCommand(rawInput, context = {}) {
 
   if (normalized === 'repeat' || normalized === 'repeat that' || normalized === 'say that again') {
     return { response: '__REPEAT__', navigated: false };
+  }
+
+  // ── 2b. Greetings & Pleasantries ───────────────────────────────
+  if (
+    normalized === 'hi' ||
+    normalized === 'hello' ||
+    normalized === 'hey' ||
+    normalized === 'hey there' ||
+    normalized === 'hello there' ||
+    normalized === 'hi there' ||
+    normalized.startsWith('hi ') ||
+    normalized.startsWith('hello ') ||
+    normalized.startsWith('hey ') ||
+    normalized.includes('good morning') ||
+    normalized.includes('good afternoon') ||
+    normalized.includes('good evening') ||
+    normalized === 'greetings' ||
+    normalized === 'hola'
+  ) {
+    return { response: answerScripts.GREETING(), navigated: false };
+  }
+
+  if (
+    normalized.includes('how are you') ||
+    normalized.includes('how are you doing') ||
+    normalized.includes('how are things') ||
+    normalized.includes('hows it going') ||
+    normalized.includes("how's it going")
+  ) {
+    return { response: answerScripts.HOW_ARE_YOU(), navigated: false };
+  }
+
+  if (
+    normalized === 'thanks' ||
+    normalized === 'thank you' ||
+    normalized === 'thx' ||
+    normalized.startsWith('thank you') ||
+    normalized.startsWith('thanks')
+  ) {
+    return { response: answerScripts.THANK_YOU(), navigated: false };
   }
 
   // ── 3. What is SpendMesh / About ────────────────────────────────
@@ -266,17 +306,49 @@ export function processCommand(rawInput, context = {}) {
     return { response: answerScripts.CHECK_TREASURY_BALANCE({ policy }), navigated: false };
   }
 
-  // ── 14b. Pending Approvals Count ────────────────────────────────
+  // ── 14b. Pending Approvals & Approval Workflow ──────────────────
   if (
-    normalized.includes('pending') ||
-    normalized.includes('approv') ||
-    normalized.includes('queue') ||
-    normalized.includes('how many approval')
+    normalized.includes('how many approval') ||
+    normalized.includes('pending approval') ||
+    normalized.includes('approval count') ||
+    normalized.includes('approval queue') ||
+    normalized.includes('pending count') ||
+    normalized === 'pending approvals' ||
+    normalized === 'approvals' ||
+    normalized === 'pending'
   ) {
     return { response: answerScripts.PENDING_APPROVALS_COUNT({ pendingApprovals, approvedDeals }), navigated: false };
   }
 
-  // ── 14c. Explain PayPal Escrow ──────────────────────────────────
+  if (
+    normalized.includes('how do approval') ||
+    normalized.includes('explain approval') ||
+    normalized.includes('approval process') ||
+    normalized.includes('approval rule') ||
+    normalized.includes('approval policy')
+  ) {
+    return {
+      response: `Deals over your $${policy?.autoApproveLimit ?? 1000} auto-approve limit require executive sign-off in the Approvals queue before funds can be settled via PayPal.`,
+      navigated: false
+    };
+  }
+
+  // ── 14c. Explain Current Page / Screen Perspective ─────────────
+  if (
+    normalized.includes('what page') ||
+    normalized.includes('where am i') ||
+    normalized.includes('explain this page') ||
+    normalized.includes('explain page') ||
+    normalized.includes('what is this page') ||
+    normalized.includes('what can i do here') ||
+    normalized.includes('about this page') ||
+    normalized.includes('about this screen') ||
+    normalized.includes('explain screen')
+  ) {
+    return { response: answerScripts.EXPLAIN_PAGE({ currentPath }), navigated: false };
+  }
+
+  // ── 14d. Explain PayPal Escrow ──────────────────────────────────
   if (
     normalized.includes('escrow') ||
     normalized.includes('paypal escrow') ||

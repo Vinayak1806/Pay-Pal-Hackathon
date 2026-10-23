@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { paymentService, dealService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ReceiptModal from '../components/ReceiptModal';
 import {
   CheckCircle,
   AlertTriangle,
@@ -15,7 +16,11 @@ import {
   Eye,
   Code2,
   Layers,
-  Volume2
+  Volume2,
+  Sparkles,
+  Lightbulb,
+  ShieldCheck,
+  ArrowRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
@@ -401,11 +406,10 @@ export default function PaymentSuccess() {
                 <button
                   type="button"
                   onClick={() => setViewMode('formatted')}
-                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md flex items-center gap-1 transition-all ${
-                    viewMode === 'formatted'
+                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md flex items-center gap-1 transition-all ${viewMode === 'formatted'
                       ? 'bg-white text-[#0F172A] font-semibold shadow-2xs border border-[#E2E8F0]'
                       : 'text-[#64748B] hover:text-[#0F172A]'
-                  }`}
+                    }`}
                 >
                   <Eye className="w-3 h-3" />
                   <span>Formatted</span>
@@ -413,11 +417,10 @@ export default function PaymentSuccess() {
                 <button
                   type="button"
                   onClick={() => setViewMode('raw')}
-                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md flex items-center gap-1 transition-all ${
-                    viewMode === 'raw'
+                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md flex items-center gap-1 transition-all ${viewMode === 'raw'
                       ? 'bg-white text-[#0F172A] font-semibold shadow-2xs border border-[#E2E8F0]'
                       : 'text-[#64748B] hover:text-[#0F172A]'
-                  }`}
+                    }`}
                 >
                   <Code2 className="w-3 h-3" />
                   <span>Raw JSON</span>

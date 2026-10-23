@@ -72,17 +72,17 @@ export const narrationScripts = {
 
   PAGE_CHANGED: ({ page } = {}) => {
     const descriptions = {
-      '/':            'Overview dashboard.',
-      '/requests':    'Purchase requests console.',
+      '/': 'Overview dashboard.',
+      '/requests': 'Purchase requests console.',
       '/marketplace': 'Purchase requests console.',
-      '/agents':      'Autonomous agent directory.',
+      '/agents': 'Autonomous agent directory.',
       '/transactions': 'Settled PayPal transaction ledger.',
-      '/dashboard':   'Settled PayPal transaction ledger.',
-      '/policy':      'Spending policy rules and thresholds.',
-      '/audit':       'Cryptographic audit log.',
-      '/approvals':   'Executive approvals queue.',
+      '/dashboard': 'Settled PayPal transaction ledger.',
+      '/policy': 'Spending policy rules and thresholds.',
+      '/audit': 'Cryptographic audit log.',
+      '/approvals': 'Executive approvals queue.',
       '/payment/success': 'PayPal payment verified successfully.',
-      '/payment/cancel':  'PayPal payment was cancelled.'
+      '/payment/cancel': 'PayPal payment was cancelled.'
     };
     return descriptions[page] || `Navigated to ${page}.`;
   },
@@ -91,6 +91,15 @@ export const narrationScripts = {
 // ─── Answer Scripts (for spoken/typed questions) ────────────────────
 
 export const answerScripts = {
+
+  GREETING: () =>
+    `Hello! I am SpendMesh AI Security Guide. I monitor autonomous agent spending, enforce policy guardrails, and secure PayPal transactions. How can I help you today?`,
+
+  HOW_ARE_YOU: () =>
+    `I am running smoothly and actively monitoring agent spending guardrails. How can I assist your workflow today?`,
+
+  THANK_YOU: () =>
+    `You are very welcome! Let me know if you need any assistance with budget, approvals, or payments.`,
 
   WHAT_IS_SPENDMESH: () =>
     `SpendMesh AI is the financial trust layer enforcing spending guardrails on autonomous AI agents.`,
@@ -231,6 +240,38 @@ export const answerScripts = {
     return `Recent event: ${lastEvent.type?.replace(/_/g, ' ').toLowerCase()}.`;
   },
 
+  EXPLAIN_PAGE: ({ currentPath } = {}) => {
+    const path = currentPath || '/';
+    if (path === '/' || path === '/overview') {
+      return `You are on the Overview Dashboard. Here you can monitor treasury funds, agent procurement activity, and recent security events.`;
+    }
+    if (path.includes('/requests') || path.includes('/marketplace')) {
+      return `You are on the Purchase Requests console. Enter your business requirements and budget ceiling to compare bids from competing AI agents.`;
+    }
+    if (path.includes('/agents')) {
+      return `You are in the Agent Marketplace directory. Browse certified autonomous seller agents, specialties, and trust reputations.`;
+    }
+    if (path.includes('/approvals')) {
+      return `You are in the Executive Approvals Queue. Review, approve, or reject agent transactions that exceed your automated spending limit.`;
+    }
+    if (path.includes('/transactions')) {
+      return `You are on the Settled Transactions Ledger. Inspect captured PayPal orders, cryptographic deliverable hashes, and escrow receipts.`;
+    }
+    if (path.includes('/policy')) {
+      return `You are in the Policy Center. Configure spending limits, approved vendor categories, and replay guardrails.`;
+    }
+    if (path.includes('/audit')) {
+      return `You are in the Cryptographic Audit Log. Verify the immutable SHA-256 chain of agent requests, policy checks, and PayPal captures.`;
+    }
+    if (path.includes('/payment/success')) {
+      return `You are on the Payment Confirmation page. Your PayPal order is settled, budget deducted, and the completed AI deliverable is ready.`;
+    }
+    if (path.includes('/payment/cancel')) {
+      return `You are on the Payment Cancelled page. No PayPal funds were captured, and reserved funds are restored to treasury.`;
+    }
+    return `SpendMesh AI is standing by to guide your autonomous procurement workflow.`;
+  },
+
   UNSUPPORTED: ({ command } = {}) =>
     command
       ? `I didn't recognize "${command}". Try asking about balance, policy rules, or next steps.`
@@ -244,48 +285,63 @@ export const answerScripts = {
 
 export const quickActionsForPage = {
   '/': [
-    { label: 'What is SpendMesh AI?', command: 'what is spendmesh' },
-    { label: 'Check my budget', command: 'check budget' },
-    { label: 'What should I do next?', command: 'what should i do next' },
+    { label: '💳 Treasury Balance', command: 'check treasury balance' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
+    { label: '🛡️ How SpendMesh Protects', command: 'how does spendmesh protect me' },
+    { label: '⏳ Pending Approvals', command: 'pending approvals count' },
   ],
   '/requests': [
-    { label: 'What should I do next?', command: 'what should i do next' },
-    { label: 'How does Gemini work here?', command: 'what is gemini doing' },
-    { label: 'Check my budget', command: 'check budget' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
+    { label: '🤖 What is Gemini doing?', command: 'what is gemini doing' },
+    { label: '💳 Check my budget', command: 'check budget' },
+    { label: '🛡️ Explain PayPal Escrow', command: 'explain paypal escrow' },
   ],
   '/marketplace': [
-    { label: 'What should I do next?', command: 'what should i do next' },
-    { label: 'How does Gemini work here?', command: 'what is gemini doing' },
-    { label: 'Check my budget', command: 'check budget' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
+    { label: '🤖 What is Gemini doing?', command: 'what is gemini doing' },
+    { label: '💳 Check my budget', command: 'check budget' },
+    { label: '🛡️ Explain PayPal Escrow', command: 'explain paypal escrow' },
   ],
   '/approvals': [
-    { label: 'How do I pay after approval?', command: 'how do i pay after approval' },
-    { label: 'What should I do next?', command: 'what should i do next' },
-    { label: 'Why is approval required?', command: 'why approval required' },
+    { label: '💳 How to pay approved deal?', command: 'how do i pay after approval' },
+    { label: '⚠️ Why approval required?', command: 'why approval required' },
+    { label: '⏳ Pending Approvals Count', command: 'pending approvals count' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
   ],
   '/audit': [
-    { label: 'Explain the audit log', command: 'explain audit' },
-    { label: 'How does SpendMesh protect me?', command: 'how does spendmesh protect me' },
-    { label: 'What is happening now?', command: 'what happened' },
+    { label: '📜 Explain the audit log', command: 'explain audit' },
+    { label: '🛡️ How SpendMesh protects', command: 'how does spendmesh protect me' },
+    { label: '📊 What happened recently?', command: 'what happened' },
   ],
   '/policy': [
-    { label: 'Check my budget', command: 'check budget' },
-    { label: 'Explain this policy check', command: 'explain policy' },
-    { label: 'How does SpendMesh protect me?', command: 'how does spendmesh protect me' },
+    { label: '📋 Explain this policy check', command: 'explain policy' },
+    { label: '💳 Check my budget', command: 'check budget' },
+    { label: '🛡️ How SpendMesh protects', command: 'how does spendmesh protect me' },
   ],
   '/transactions': [
-    { label: 'Was the payment captured?', command: 'was payment captured' },
-    { label: 'Explain the audit log', command: 'explain audit' },
-    { label: 'What should I do next?', command: 'what should i do next' },
+    { label: '✅ Was payment captured?', command: 'was payment captured' },
+    { label: '📜 Explain the audit ledger', command: 'explain audit' },
+    { label: '📊 Summarize today\'s spend', command: "summarize today's spend" },
   ],
   '/agents': [
-    { label: 'What is SpendMesh AI?', command: 'what is spendmesh' },
-    { label: 'How does Gemini work here?', command: 'what is gemini doing' },
-    { label: 'How does SpendMesh protect me?', command: 'how does spendmesh protect me' },
+    { label: '🤖 What is SpendMesh AI?', command: 'what is spendmesh' },
+    { label: '⚡ How does Gemini work here?', command: 'what is gemini doing' },
+    { label: '🛡️ How SpendMesh protects', command: 'how does spendmesh protect me' },
+  ],
+  '/payment/success': [
+    { label: '✅ Was payment captured?', command: 'was payment captured' },
+    { label: '📜 Explain audit certificate', command: 'explain audit' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
+  ],
+  '/payment/cancel': [
+    { label: '⚠️ Was payment cancelled?', command: 'was payment captured' },
+    { label: '💳 Check treasury balance', command: 'check treasury balance' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
   ],
   DEFAULT: [
-    { label: 'What is SpendMesh AI?', command: 'what is spendmesh' },
-    { label: 'What should I do next?', command: 'what should i do next' },
-    { label: 'How does PayPal work here?', command: 'how does paypal work' },
+    { label: '🤖 What is SpendMesh AI?', command: 'what is spendmesh' },
+    { label: '💳 Treasury Balance', command: 'check treasury balance' },
+    { label: '💡 What should I do next?', command: 'what should i do next' },
+    { label: '🛡️ PayPal Escrow', command: 'explain paypal escrow' },
   ],
 };

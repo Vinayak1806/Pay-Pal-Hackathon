@@ -65,8 +65,8 @@ async function callGeminiWithTimeout(prompt, timeoutMs = 15000) {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error.message && error.message.includes('404') ||
-        error.message && error.message.includes('not found') ||
-        error.status === 404) {
+      error.message && error.message.includes('not found') ||
+      error.status === 404) {
       console.warn(`Model ${currentModelName} not found. Retrying with gemini-2.5-flash...`);
       const fallbackModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       const result = await fallbackModel.generateContent(prompt);
@@ -393,13 +393,15 @@ async function answerAssistantQuery(query, context = {}) {
   const remaining = Math.max(0, total - spent - committed);
 
   const prompt = `You are SpendMesh AI Financial Security Guide.
-Give an ultra-short, crisp 1-sentence answer (maximum 14 words) suitable for speech audio.
-Never use markdown asterisks, bolding, bullet points, or emoji. Be direct and clear.
+Give an ultra-short, crisp 1-sentence answer (maximum 16 words) suitable for speech audio.
+Never use markdown asterisks, bolding, bullet points, or emoji. Be direct, authoritative, and clear.
 
-State:
+Context:
+- Current Page: ${currentPath || '/'}
 - Remaining budget: $${remaining.toFixed(2)}
 - Spent: $${spent.toFixed(2)}
 - Auto-approve limit: $${policy?.autoApproveLimit || 1000}
+${currentDeal ? `- Current deal: $${currentDeal.agreedAmount || currentDeal.price} with ${currentDeal.sellerName || currentDeal.sellerAgent}` : ''}
 
 User Question: "${query}"
 
@@ -415,9 +417,54 @@ User Question: "${query}"
     };
   } catch (error) {
     console.warn('Gemini assistant query fallback:', error.message);
+    const q = (query || '').toLowerCase();
+    const path = currentPath || '/';
+
+    if (q.includes('escrow') || q.includes('paypal')) {
+      return {
+        success: true,
+        response: `SpendMesh reserves treasury funds server-side and settles payment securely via PayPal Orders v2 upon delivery.`,
+        source: 'fallback'
+      };
+    }
+    if (q.includes('approv')) {
+      return {
+        success: true,
+        response: `Transactions over $${policy?.autoApproveLimit || 1000} require human approval in the Approvals queue.`,
+        source: 'fallback'
+      };
+    }
+    if (q.includes('next') || q.includes('do') || q.includes('step')) {
+      if (path.includes('requests') || path.includes('marketplace')) {
+        return {
+          success: true,
+          response: `Submit your procurement requirements and compare competing agent bids within policy limits.`,
+          source: 'fallback'
+        };
+      }
+      if (path.includes('approvals')) {
+        return {
+          success: true,
+          response: `Review pending deals and authorize PayPal checkout for approved work.`,
+          source: 'fallback'
+        };
+      }
+      if (path.includes('success')) {
+        return {
+          success: true,
+          response: `Your PayPal payment is settled. Download your deliverable or view the compliance receipt.`,
+          source: 'fallback'
+        };
+      }
+      return {
+        success: true,
+        response: `Submit a purchase request or review your treasury balance in the dashboard.`,
+        source: 'fallback'
+      };
+    }
     return {
       success: true,
-      response: `You have $${remaining.toFixed(2)} available with a $${policy?.autoApproveLimit || 1000} approval limit.`,
+      response: `You have $${remaining.toFixed(2)} available budget with a $${policy?.autoApproveLimit || 1000} auto-approval limit.`,
       source: 'fallback'
     };
   }

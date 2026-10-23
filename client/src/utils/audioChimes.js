@@ -7,24 +7,34 @@
  */
 
 let audioCtx = null;
+let userHasInteracted = false;
 
 function getAudioContext() {
   if (typeof window === 'undefined') return null;
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextClass) return null;
+  // If user hasn't interacted with page yet, don't create AudioContext to avoid Chrome console error
+  if (!userHasInteracted && !audioCtx) {
+    return null;
+  }
   if (!audioCtx) {
-    audioCtx = new AudioContextClass();
+    try {
+      audioCtx = new AudioContextClass();
+    } catch (e) {
+      return null;
+    }
   }
   if (audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
+    audioCtx.resume().catch(() => { });
   }
   return audioCtx;
 }
 
 if (typeof window !== 'undefined') {
   const unlockAudio = () => {
+    userHasInteracted = true;
     if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
+      audioCtx.resume().catch(() => { });
     }
   };
   window.addEventListener('click', unlockAudio, { passive: true });
@@ -95,7 +105,7 @@ export function playAlertChime() {
       osc.start(now + idx * 0.12);
       osc.stop(now + idx * 0.12 + 0.3);
     });
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -124,7 +134,7 @@ export function playShieldBlockedChime() {
 
     osc.start(now);
     osc.stop(now + 0.26);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -152,5 +162,5 @@ export function playAssistantOpenChime() {
 
     osc.start(now);
     osc.stop(now + 0.2);
-  } catch (e) {}
+  } catch (e) { }
 }

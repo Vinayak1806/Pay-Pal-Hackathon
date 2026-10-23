@@ -20,7 +20,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Mic, MicOff, Volume2, VolumeX, StopCircle,
-  X, RotateCcw, Send, Shield
+  X, RotateCcw, Send, Shield, WifiOff
 } from 'lucide-react';
 import { useVoice } from './useVoice';
 import { processCommand } from './voiceCommands';
@@ -31,7 +31,8 @@ import { agentService } from '../services/api';
 import {
   playSuccessChime,
   playAlertChime,
-  playShieldBlockedChime
+  playShieldBlockedChime,
+  playAssistantOpenChime
 } from '../utils/audioChimes';
 
 // ─── Conversation Message Types ────────────────────────────────
@@ -61,7 +62,7 @@ function Message({ msg }) {
         </div>
         <div className="rounded-xl px-3 py-2 text-[12px] bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] flex items-center gap-1.5 italic">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-ping" />
-          <span>Consulting Gemini 2.5 Flash...</span>
+          <span>Thinking...</span>
         </div>
       </div>
     );
@@ -75,11 +76,10 @@ function Message({ msg }) {
         </div>
       )}
       <div
-        className={`max-w-[85%] rounded-xl px-3 py-2 text-[12.5px] leading-relaxed ${
-          isUser
-            ? 'bg-[#EFF4FF] text-[#1E40AF] rounded-tr-none'
-            : 'bg-[#F8FAFC] text-[#1E293B] rounded-tl-none border border-[#E2E8F0]'
-        }`}
+        className={`max-w-[85%] rounded-xl px-3 py-2 text-[12.5px] leading-relaxed ${isUser
+          ? 'bg-[#EFF4FF] text-[#1E40AF] rounded-tr-none'
+          : 'bg-[#F8FAFC] text-[#1E293B] rounded-tl-none border border-[#E2E8F0]'
+          }`}
       >
         {msg.text}
       </div>
@@ -142,18 +142,39 @@ export default function VoiceAssistant() {
     ]);
   }, []);
 
+  // Sync live recognition transcript into textInput for visibility and user editing
+  useEffect(() => {
+    if (isListening && transcript) {
+      setTextInput(transcript);
+    }
+  }, [isListening, transcript]);
+
+  const lastProcessedInputRef = useRef({ text: '', timestamp: 0 });
+
   // ── Process user input (voice or text) ──────────────────────────
   const handleUserInput = useCallback((input) => {
     if (!input?.trim()) return;
+    const trimmed = input.trim();
+    const now = Date.now();
 
-    addMessage(MSG.USER, input);
+    // Deduplication: prevent identical command from firing twice within 1.2s
+    if (
+      lastProcessedInputRef.current.text.toLowerCase() === trimmed.toLowerCase() &&
+      (now - lastProcessedInputRef.current.timestamp) < 1200
+    ) {
+      return;
+    }
+    lastProcessedInputRef.current = { text: trimmed, timestamp: now };
+
+    addMessage(MSG.USER, trimmed);
     clearTranscript();
+    setTextInput('');
 
-    const result = processCommand(input, {
+    const result = processCommand(trimmed, {
+      ...voiceAppContext,
       navigate,
       currentPath: location.pathname,
       lastEvent: lastEventRef.current,
-      ...voiceAppContext,
     });
 
     // Handle special control commands
@@ -196,8 +217,8 @@ export default function VoiceAssistant() {
       ]);
 
       agentService.chat(input, {
+        ...voiceAppContext,
         currentPath: location.pathname,
-        ...voiceAppContext
       }).then((res) => {
         const text = res?.response || result.response;
         setMessages(prev => prev.map(m => m.id === thinkingId ? { ...m, text, isThinking: false } : m));
@@ -223,12 +244,12 @@ export default function VoiceAssistant() {
     if (isListening) {
       stopListening();
     } else {
-      playAssistantOpenChime();
+      stopSpeaking();
       startListening((recognized) => {
         handleUserInput(recognized);
       });
     }
-  }, [isListening, startListening, stopListening, handleUserInput]);
+  }, [isListening, startListening, stopListening, stopSpeaking, handleUserInput]);
 
   // ── Handle text submit ──────────────────────────────────────────
   const handleTextSubmit = (e) => {
@@ -244,7 +265,7 @@ export default function VoiceAssistant() {
     // Clear legacy permanent localStorage flag from prior builds so it doesn't block repeat visits
     try {
       localStorage.removeItem('spendmesh_welcomed_first_time');
-    } catch (e) {}
+    } catch (e) { }
 
     // Check if current browser session was already welcomed
     const sessionWelcomed = sessionStorage.getItem('spendmesh_session_welcomed');
@@ -256,14 +277,14 @@ export default function VoiceAssistant() {
     if (sessionWelcomed === 'true' || isPageReload) {
       try {
         sessionStorage.setItem('spendmesh_session_welcomed', 'true');
-      } catch (e) {}
+      } catch (e) { }
       return; // Do NOT trigger on refresh or within the same active tab session
     }
 
     // Mark current visit session as welcomed
     try {
       sessionStorage.setItem('spendmesh_session_welcomed', 'true');
-    } catch (e) {}
+    } catch (e) { }
 
     const welcomeText = narrationScripts.WELCOME();
     addMessage(MSG.ASSISTANT, welcomeText);
@@ -275,7 +296,7 @@ export default function VoiceAssistant() {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         try {
           window.speechSynthesis.resume();
-        } catch (e) {}
+        } catch (e) { }
       }
       if (!isMuted) {
         speak(welcomeText, { priority: 0 });
@@ -294,7 +315,7 @@ export default function VoiceAssistant() {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         try {
           window.speechSynthesis.resume();
-        } catch (e) {}
+        } catch (e) { }
       }
       if (!window.speechSynthesis?.speaking) {
         playWelcomeSpeech(true);
@@ -328,6 +349,8 @@ export default function VoiceAssistant() {
     };
   }, [isMuted, speak, addMessage]);
 
+  const announcedEventsRef = useRef(new Set());
+
   // ── Subscribe to voiceEventBus events ───────────────────────────
   useEffect(() => {
     const handlers = [];
@@ -335,19 +358,12 @@ export default function VoiceAssistant() {
     const subscribe = (eventType, scriptFn, priority = 0) => {
       const handler = (event) => {
         lastEventRef.current = event;
-        const eventKey = `${eventType}-${event.timestamp}`;
-        // Skip if we already announced this exact event
-        setLastAnnouncedEvents(prev => {
-          if (prev.has(eventKey)) return prev;
-          const next = new Set(prev);
-          next.add(eventKey);
-          // Keep set bounded
-          if (next.size > 50) {
-            const iter = next.values();
-            next.delete(iter.next().value);
-          }
-          return next;
-        });
+        const eventKey = `${eventType}-${event.timestamp || ''}-${event.amount || ''}-${event.dealId || ''}-${event.captureId || ''}`;
+        
+        // Synchronous dedup: skip if this event was already announced within 4 seconds
+        if (announcedEventsRef.current.has(eventKey)) return;
+        announcedEventsRef.current.add(eventKey);
+        setTimeout(() => announcedEventsRef.current.delete(eventKey), 4000);
 
         const text = scriptFn(event);
         if (!text) return;
@@ -375,24 +391,24 @@ export default function VoiceAssistant() {
     };
 
     // Workflow events (normal priority)
-    subscribe(VoiceEvents.REQUEST_PARSING,    narrationScripts.REQUEST_PARSING,    0);
-    subscribe(VoiceEvents.PARSE_COMPLETE,     narrationScripts.PARSE_COMPLETE,     0);
-    subscribe(VoiceEvents.OFFERS_LOADED,      narrationScripts.OFFERS_LOADED,      0);
-    subscribe(VoiceEvents.POLICY_PASSED,      narrationScripts.POLICY_PASSED,      1);
-    subscribe(VoiceEvents.POLICY_BLOCKED,     narrationScripts.POLICY_BLOCKED,     1);
-    subscribe(VoiceEvents.APPROVAL_REQUIRED,  narrationScripts.APPROVAL_REQUIRED,  1);
-    subscribe(VoiceEvents.APPROVAL_GRANTED,   narrationScripts.APPROVAL_GRANTED,   1);
-    subscribe(VoiceEvents.APPROVAL_REJECTED,  narrationScripts.APPROVAL_REJECTED,  1);
-    subscribe(VoiceEvents.CHECKOUT_READY,     narrationScripts.CHECKOUT_READY,     0);
+    subscribe(VoiceEvents.REQUEST_PARSING, narrationScripts.REQUEST_PARSING, 0);
+    subscribe(VoiceEvents.PARSE_COMPLETE, narrationScripts.PARSE_COMPLETE, 0);
+    subscribe(VoiceEvents.OFFERS_LOADED, narrationScripts.OFFERS_LOADED, 0);
+    subscribe(VoiceEvents.POLICY_PASSED, narrationScripts.POLICY_PASSED, 1);
+    subscribe(VoiceEvents.POLICY_BLOCKED, narrationScripts.POLICY_BLOCKED, 1);
+    subscribe(VoiceEvents.APPROVAL_REQUIRED, narrationScripts.APPROVAL_REQUIRED, 1);
+    subscribe(VoiceEvents.APPROVAL_GRANTED, narrationScripts.APPROVAL_GRANTED, 1);
+    subscribe(VoiceEvents.APPROVAL_REJECTED, narrationScripts.APPROVAL_REJECTED, 1);
+    subscribe(VoiceEvents.CHECKOUT_READY, narrationScripts.CHECKOUT_READY, 0);
     subscribe(VoiceEvents.CHECKOUT_INITIATED, narrationScripts.CHECKOUT_INITIATED, 1);
-    subscribe(VoiceEvents.CAPTURE_VERIFIED,   narrationScripts.CAPTURE_VERIFIED,   1);
-    subscribe(VoiceEvents.CAPTURE_FAILED,     narrationScripts.CAPTURE_FAILED,     1);
-    subscribe(VoiceEvents.LEDGER_VERIFIED,    narrationScripts.LEDGER_VERIFIED,    0);
+    subscribe(VoiceEvents.CAPTURE_VERIFIED, narrationScripts.CAPTURE_VERIFIED, 1);
+    subscribe(VoiceEvents.CAPTURE_FAILED, narrationScripts.CAPTURE_FAILED, 1);
+    subscribe(VoiceEvents.LEDGER_VERIFIED, narrationScripts.LEDGER_VERIFIED, 0);
 
     // Security events (highest priority — interrupt current speech)
-    subscribe(VoiceEvents.TAMPER_BLOCKED,     narrationScripts.TAMPER_BLOCKED,     2);
-    subscribe(VoiceEvents.DUPLICATE_BLOCKED,  narrationScripts.DUPLICATE_BLOCKED,  2);
-    subscribe(VoiceEvents.BUDGET_EXCEEDED,    narrationScripts.BUDGET_EXCEEDED,    1);
+    subscribe(VoiceEvents.TAMPER_BLOCKED, narrationScripts.TAMPER_BLOCKED, 2);
+    subscribe(VoiceEvents.DUPLICATE_BLOCKED, narrationScripts.DUPLICATE_BLOCKED, 2);
+    subscribe(VoiceEvents.BUDGET_EXCEEDED, narrationScripts.BUDGET_EXCEEDED, 1);
 
     return () => handlers.forEach(unsub => unsub());
   }, [addMessage, speak, openAssistant]);
@@ -446,6 +462,18 @@ export default function VoiceAssistant() {
               <span className="font-semibold text-[13px]">Security Guide</span>
             </div>
           )}
+          {/* Active Page Perspective Badge */}
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-medium border border-white/20 truncate max-w-[110px]" title={location.pathname}>
+            {location.pathname === '/' ? 'Dashboard' :
+             location.pathname.includes('/requests') ? 'Requests' :
+             location.pathname.includes('/approvals') ? 'Approvals' :
+             location.pathname.includes('/transactions') ? 'Transactions' :
+             location.pathname.includes('/policy') ? 'Policy' :
+             location.pathname.includes('/audit') ? 'Audit Log' :
+             location.pathname.includes('/agents') ? 'Agents' :
+             location.pathname.includes('/payment/success') ? 'Payment Settled' :
+             location.pathname.includes('/payment/cancel') ? 'Cancelled' : 'Overview'}
+          </span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -487,11 +515,10 @@ export default function VoiceAssistant() {
 
       {/* ── Status banner ──────────────────────────────────────── */}
       {(permissionDenied || error || !canSpeak) && (
-        <div className={`px-4 py-2 text-[11px] border-b flex items-start gap-2 shrink-0 ${
-          permissionDenied || !canSpeak
-            ? 'bg-[#FFFBEB] border-[#FED7AA] text-[#92400E]'
-            : 'bg-[#FEF2F2] border-[#FECACA] text-[#B42318]'
-        }`}>
+        <div className={`px-4 py-2 text-[11px] border-b flex items-start gap-2 shrink-0 ${permissionDenied || !canSpeak
+          ? 'bg-[#FFFBEB] border-[#FED7AA] text-[#92400E]'
+          : 'bg-[#FEF2F2] border-[#FECACA] text-[#B42318]'
+          }`}>
           {!canSpeak && !permissionDenied && (
             <><WifiOff className="w-3.5 h-3.5 shrink-0 mt-0.5" /><span>Speech synthesis is not supported in this browser. Text mode active.</span></>
           )}
@@ -514,49 +541,31 @@ export default function VoiceAssistant() {
         {messages.map((msg) => (
           <Message key={msg.id} msg={msg} />
         ))}
-        {isListening && transcript && (
-          <div className="flex gap-2 items-start flex-row-reverse">
-            <div className="max-w-[85%] rounded-xl px-3 py-2 text-[12.5px] leading-relaxed bg-[#EFF4FF] text-[#1E40AF] rounded-tr-none opacity-70 italic">
-              {transcript}...
+        {isListening && (
+          <div className="flex gap-2 items-start flex-row-reverse animate-in fade-in duration-150">
+            <div className="max-w-[85%] rounded-xl px-3 py-2 text-[12.5px] leading-relaxed bg-[#EFF4FF] text-[#1E40AF] rounded-tr-none border border-blue-200 shadow-2xs flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
+              <span className="italic font-medium">
+                {transcript ? `"${transcript}"...` : 'Listening... speak now'}
+              </span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── Sleek Horizontal Prompt Pills (Single Row) ─────────── */}
+      {/* ── Contextual Horizontal Prompt Pills (Dynamic Per Page) ─── */}
       <div className="px-3 py-1.5 border-t border-[#F1F5F9] bg-[#FAFAFD] shrink-0">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          <button
-            onClick={() => handleUserInput('Check Treasury Balance')}
-            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
-          >
-            <span>💳</span> Treasury Balance
-          </button>
-          <button
-            onClick={() => handleUserInput('Pending Approvals Count')}
-            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
-          >
-            <span>⏳</span> Pending Approvals
-          </button>
-          <button
-            onClick={() => handleUserInput('Explain PayPal Escrow')}
-            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
-          >
-            <span>🛡️</span> PayPal Escrow
-          </button>
-          <button
-            onClick={() => handleUserInput("Summarize Today's Spend")}
-            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
-          >
-            <span>📊</span> Today's Spend
-          </button>
-          <button
-            onClick={() => handleUserInput('What should I do next?')}
-            className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
-          >
-            <span>💡</span> Next Step
-          </button>
+          {currentQuickActions.map((action, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleUserInput(action.command)}
+              className="text-[11.5px] px-3 py-1 rounded-full border border-[#D0D5DD] bg-white text-[#344054] hover:bg-[#F8FAFC] hover:text-[#101828] hover:border-[#98A2B3] transition-colors font-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95"
+            >
+              <span>{action.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -570,11 +579,10 @@ export default function VoiceAssistant() {
               onClick={handleMicClick}
               aria-label={isListening ? 'Stop listening' : 'Start voice input'}
               title={isListening ? 'Stop listening (click to cancel)' : 'Click to speak'}
-              className={`w-9 h-9 shrink-0 rounded-full flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
-                isListening
-                  ? 'bg-red-500 text-white shadow-lg shadow-red-200 animate-pulse'
-                  : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-sm'
-              }`}
+              className={`w-9 h-9 shrink-0 rounded-full flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${isListening
+                ? 'bg-red-500 text-white shadow-lg shadow-red-200 animate-pulse'
+                : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-sm'
+                }`}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
@@ -586,9 +594,16 @@ export default function VoiceAssistant() {
             type="text"
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
-            placeholder={canListen ? 'Type or speak...' : 'Type a question...'}
+            placeholder={
+              isListening
+                ? (transcript ? `Heard: "${transcript}"` : '🎙️ Listening... speak now')
+                : (canListen ? 'Type or speak...' : 'Type a question...')
+            }
             aria-label="Ask the voice assistant a question"
-            className="flex-1 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full px-3.5 py-2 text-[12.5px] text-[#101828] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
+            className={`flex-1 rounded-full px-3.5 py-2 text-[12.5px] text-[#101828] placeholder:text-[#94A3B8] focus:outline-none transition-all ${isListening
+              ? 'bg-blue-50/80 border-2 border-blue-400 ring-2 ring-blue-100 placeholder:text-blue-700'
+              : 'bg-[#F8FAFC] border border-[#E2E8F0] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent'
+              }`}
           />
 
           {/* Send button */}

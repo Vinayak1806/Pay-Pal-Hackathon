@@ -16,7 +16,7 @@ import PaymentCancel from './pages/PaymentCancel';
 import Footer from './components/Footer';
 
 // Voice Assistant System
-import { VoiceProvider } from './context/VoiceContext';
+import { VoiceProvider, useVoiceContext } from './context/VoiceContext';
 import VoiceAssistant from './voice/VoiceAssistant';
 import VoiceButton from './voice/VoiceButton';
 import { voiceEventBus, VoiceEvents } from './voice/voiceEventBus';
@@ -24,13 +24,15 @@ import { voiceEventBus, VoiceEvents } from './voice/voiceEventBus';
 function RouteWatcher() {
   const location = useLocation();
   const prevPath = useRef(location.pathname);
+  const { updateVoiceContext } = useVoiceContext();
 
   useEffect(() => {
+    updateVoiceContext({ currentPath: location.pathname });
     if (prevPath.current !== location.pathname) {
       prevPath.current = location.pathname;
       voiceEventBus.emit(VoiceEvents.PAGE_CHANGED, location.pathname);
     }
-  }, [location.pathname]);
+  }, [location.pathname, updateVoiceContext]);
 
   return null;
 }

@@ -13,7 +13,11 @@ import {
   Search,
   Globe,
   FileEdit,
-  Palette
+  Palette,
+  BarChart3,
+  Layers,
+  Sliders,
+  DollarSign
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
