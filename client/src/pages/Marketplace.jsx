@@ -20,10 +20,12 @@ import {
   RotateCcw,
   Sparkles,
   Mic,
-  X
+  X,
+  Search
 } from 'lucide-react';
 import { agentService, dealService, policyService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import StatusBadge from '../components/StatusBadge';
 import toast from 'react-hot-toast';
 import voiceEventBus, { VoiceEvents } from '../voice/voiceEventBus';
 import { useVoiceContext } from '../context/VoiceContext';

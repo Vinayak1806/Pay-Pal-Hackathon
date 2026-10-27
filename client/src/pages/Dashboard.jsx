@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Eye,
   FileText,
-  Printer
+  Printer,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
