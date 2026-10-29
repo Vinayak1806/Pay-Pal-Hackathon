@@ -18,6 +18,7 @@
 
 </div>
 
+[![XERJ Corpus Hub Contributor](https://hub.xerj.org/contributors/Vinayak1806/badge.svg)](https://hub.xerj.org/contributors/Vinayak1806)
 ---
 
 ## 1. Executive Summary
