@@ -48,6 +48,9 @@ const { clearOfferStore } = require('./agents/sellerAgents');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Enable trust proxy for Render / Vercel / reverse proxies to read accurate client IP
+app.set('trust proxy', 1);
+
 // ─── Security Middleware (applied in order) ───────────────────────
 // 1. Security headers
 app.use(helmet());
@@ -77,13 +80,20 @@ app.use(cors({
 // 3. Body parser with size limit
 app.use(express.json({ limit: '10kb' }));
 
-// 4. Rate limiting
+// 4. Rate limiting — configured so read queries and legitimate demo traffic never hit 429
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'production' ? 100 : 3000,
-  skip: (req) => req.path === '/api/health',
+  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 50000,
+  skip: (req) => {
+    // Never rate-limit read-only queries (deals, policy, audit, overview) or health checks
+    if (req.method === 'GET' || req.method === 'OPTIONS') return true;
+    if (req.path === '/api/health') return true;
+    if (process.env.DISABLE_RATE_LIMIT === 'true') return true;
+    return false;
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: {
     success: false,
     error: { message: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' }

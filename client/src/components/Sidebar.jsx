@@ -25,6 +25,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const fetchStatus = async () => {
+    if (typeof document !== 'undefined' && document.hidden) return;
     try {
       const [dealsRes, policyRes] = await Promise.all([
         dealService.getDeals(),
@@ -42,8 +43,15 @@ export default function Sidebar({ isOpen, onClose }) {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 20000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchStatus, 35000);
+    const handleVisibility = () => {
+      if (!document.hidden) fetchStatus();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   const handleReset = async () => {

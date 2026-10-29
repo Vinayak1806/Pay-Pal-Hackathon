@@ -66,8 +66,18 @@ export default function Approvals() {
 
   useEffect(() => {
     fetchDealsAndPolicy();
-    const timer = setInterval(fetchDealsAndPolicy, 15000);
-    return () => clearInterval(timer);
+    const timer = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchDealsAndPolicy();
+    }, 30000);
+    const handleVisibility = () => {
+      if (!document.hidden) fetchDealsAndPolicy();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   // Handle Supervisor Decision (Approve or Reject)

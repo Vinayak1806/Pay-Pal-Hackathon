@@ -23,6 +23,9 @@ api.interceptors.response.use(
       code = error.response.data.error.code || 'SERVER_ERROR';
     } else if (typeof error.response?.data?.error === 'string') {
       message = error.response.data.error;
+    } else if (error.response?.status === 429) {
+      message = error.response.data?.error?.message || 'Rate limit reached. Please wait a minute before trying again.';
+      code = 'RATE_LIMITED';
     } else if (error.response?.status === 500) {
       message = 'Server encountered a temporary error. Please try again in a moment.';
       code = 'INTERNAL_SERVER_ERROR';
